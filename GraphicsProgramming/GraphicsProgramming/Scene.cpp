@@ -140,6 +140,7 @@ void Scene::render() {
 	// Reset transformations
 	glLoadIdentity();
 	// Set the camera
+	//gluLookAt(0,0,0,0,6,0,0,1,0);
 	gluLookAt(cameraCurrent->getPosition().x, cameraCurrent->getPosition().y, cameraCurrent->getPosition().z,
 		cameraCurrent->getLookAt().x, cameraCurrent->getLookAt().y, cameraCurrent->getLookAt().z,
 		cameraCurrent->getUp().x, cameraCurrent->getUp().y, cameraCurrent->getUp().z);
@@ -149,7 +150,7 @@ void Scene::render() {
 	glBindTexture(GL_TEXTURE_2D, defaultTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
+	
 	glPushMatrix();
 	glTranslatef(2.5,0,0);
 	glScalef(0.1,0.1,0.1);
@@ -197,7 +198,7 @@ void Scene::render() {
 	glVertex3f(0.5, 0.5, 0);
 	glNormal3f(0, 0, 1);
 	glEnd();
-
+	
 	/*
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
@@ -221,6 +222,10 @@ void Scene::render() {
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	*/
+
+	glTranslatef(0,2,0);
+	square.render();
+
 
 	// End render geometry --------------------------------------
 

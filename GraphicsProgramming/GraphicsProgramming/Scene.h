@@ -17,6 +17,7 @@
 #include <vector>
 #include "Model.h"
 #include "Camera.h"
+#include "Shape.h"
 
 
 class Scene {
@@ -46,7 +47,8 @@ protected:
 
 
 
-
+	// predefined shaoes
+	Shape square;
 
 	// textures
 
