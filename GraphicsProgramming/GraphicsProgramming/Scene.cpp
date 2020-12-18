@@ -54,14 +54,16 @@ Scene::Scene(Input *in)
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	defaultTexture = SOIL_load_OGL_texture
+
+	skyBoxTexture = SOIL_load_OGL_texture
 	(
-		"gfx/crate.png",
+		"gfx/skybox.png",
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
 	);
 
+	defaultTexture = &skyBoxTexture;
 	// Initialise scene variables
 	teapot.load("models/teapot.obj","gfx/crate.png");
 	cameraCurrent = &cameraPlayer1P;
@@ -147,7 +149,16 @@ void Scene::render() {
 	
 	// Render geometry/scene here -------------------------------------
 
-	glBindTexture(GL_TEXTURE_2D, defaultTexture);
+	//skybox
+	glPushMatrix();
+	defaultTexture = &skyBoxTexture;
+	glDisable(GL_DEPTH_TEST);
+	glTranslatef(cameraCurrent->getPosition().x, cameraCurrent->getPosition().y, cameraCurrent->getPosition().z);
+	skyBox.render();
+	glEnable(GL_DEPTH_TEST);
+	glPopMatrix();
+
+	glBindTexture(GL_TEXTURE_2D, *defaultTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	

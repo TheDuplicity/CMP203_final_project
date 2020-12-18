@@ -52,7 +52,8 @@ protected:
 
 	// textures
 
-	GLuint defaultTexture;
+	GLuint* defaultTexture;
+	GLuint skyBoxTexture;
 
 	// lighting
 
@@ -73,7 +74,7 @@ protected:
 
 	// shapes
 
-
+	Shape skyBox;
 
 	// materials
 

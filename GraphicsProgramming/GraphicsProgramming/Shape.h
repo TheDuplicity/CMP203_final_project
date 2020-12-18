@@ -14,6 +14,7 @@ class Shape
 
 public:
 	Shape();
+	Shape(GLuint* inpTexture);
 	bool drawSquare();
 	bool drawCube();
 	bool drawSphere();
@@ -22,7 +23,7 @@ public:
 
 private:
 
-	GLuint texture;
+	GLuint* texture;
 	float materialColour[4];
 	bool isTransparent;
 

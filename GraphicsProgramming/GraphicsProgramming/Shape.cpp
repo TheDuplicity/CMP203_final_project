@@ -1,8 +1,15 @@
 #include "Shape.h"
 Shape::Shape() {
-	drawPyramid();
+	//drawPyramid();
 	drawCube();
-	drawSquare();
+	//drawSquare();
+
+}
+Shape::Shape(GLuint* inpTexture) {
+	//drawPyramid();
+	drawCube();
+	//drawSquare();
+	texture = inpTexture;
 
 }
 bool Shape::drawSquare() {
@@ -263,6 +270,11 @@ bool Shape::drawPyramid() {
 
 void Shape::render() {
 
+
+
+	glBindTexture(GL_TEXTURE_2D, *texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
