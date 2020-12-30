@@ -10,6 +10,14 @@ Scene::Scene(Input *in)
 
 	// Other OpenGL / render setting should be applied here.
 
+	// wireframe and fill modes
+
+	//glPolygonMode(GL_FRONT, GL_LINE);
+	//glPolygonMode(GL_BACK, GL_LINE);
+
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glPolygonMode(GL_BACK, GL_FILL);
+
 		// DEPTH TESTING
 
 	glDepthFunc(GL_LEQUAL);
@@ -57,7 +65,7 @@ Scene::Scene(Input *in)
 
 	skyBoxTexture = SOIL_load_OGL_texture
 	(
-		"gfx/skybox.png",
+		"gfx/skyBoxTexture.png",
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
@@ -71,20 +79,28 @@ Scene::Scene(Input *in)
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
 	);
 
+	floorTexture = SOIL_load_OGL_texture
+	(
+		"gfx/floorTexture.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+	);
+
 	defaultTexture = &skyBoxTexture;
 	// Initialise scene variables
-	teapot.load("models/teapot.obj","gfx/crate.png");
+	teapot.load("models/teapot.obj","gfx/floorTexture.png");
 	cameraCurrent = &cameraPlayer1P;
-	cameraSpeed = 2;
+	cameraSpeed = 20;
 	glutSetCursor(GLUT_CURSOR_NONE);
 	cameraCurrent->update();
 
 	square.loadTexture(&secondTexture);
 	square.loadShape(SH_PYRAMID);
-	skyBox.loadTexture(&secondTexture);
-	skyBox.loadShape(SH_CUBE);
-	example.loadTexture(&skyBoxTexture);
-	example.loadShape(SH_SQUARE);
+	skyBox.loadTexture(&skyBoxTexture);
+	skyBox.loadShape(SH_SKYBOX);
+	floor.loadTexture(&floorTexture);
+	floor.loadShape(SH_PLANE);
 }
 
 
@@ -147,11 +163,11 @@ void Scene::handleInput(float dt)
 	}
 	if (input->isKeyDown('o')) {
 		//square.loadTexture(&skyBoxTexture);
-		square.loadShape(SH_CUBE);
+		//floor.loadShape(SH_PLANE);
 	}
 	else {
 		//square.loadTexture(&secondTexture);
-		square.loadShape(SH_SQUARE);
+		//floor.loadShape(SH_CUBE);
 	}
 	glutWarpPointer(width / 2.0, height / 2.0);
 }
@@ -164,6 +180,8 @@ void Scene::update(float dt)
 }
 
 void Scene::render() {
+	
+	
 
 	// Clear Color and Depth Buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -178,9 +196,8 @@ void Scene::render() {
 	
 	// Render geometry/scene here -------------------------------------
 
-	//skybox
+		//skybox
 	glPushMatrix();
-	defaultTexture = &skyBoxTexture;
 	glDisable(GL_DEPTH_TEST);
 	glTranslatef(cameraCurrent->getPosition().x, cameraCurrent->getPosition().y, cameraCurrent->getPosition().z);
 	skyBox.render();
@@ -262,13 +279,16 @@ void Scene::render() {
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	*/
-
+	glPushMatrix();
 	glTranslatef(0,2,0);
 	square.render();
+	glPopMatrix();
 
-	glTranslatef(5,0,0);
-	example.render();
-
+	glPushMatrix();
+	glTranslatef(0,-3,0);
+	glScalef(5,5,5);
+	floor.render();
+	glPopMatrix();
 
 	// End render geometry --------------------------------------
 

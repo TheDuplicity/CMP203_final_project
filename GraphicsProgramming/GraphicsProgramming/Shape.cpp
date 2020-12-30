@@ -31,9 +31,135 @@ void Shape::loadShape(int selectedShape) {
 	case SH_PYRAMID:
 		setPyramid();
 		break;
+	case SH_SKYBOX:
+		setSkyBox();
+		break;
+	case SH_PLANE:
+		setPlane();
+		break;
 	default:
 		break;
 	}
+}
+bool Shape::setSkyBox() {
+	setCube();
+	textureCoords.clear();
+	//front  	// TL BL BR, TL BR TR
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(1 / 3.0);
+
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(2 / 3.0);
+
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(2 / 3.0);
+
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(1 / 3.0);
+
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(2 / 3.0);
+
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(1 / 3.0);
+	//back
+	textureCoords.push_back(0.75);
+	textureCoords.push_back(1 / 3.0);
+
+	textureCoords.push_back(0.75);
+	textureCoords.push_back(2/3.0);
+
+	textureCoords.push_back(1);
+	textureCoords.push_back(2/3.0);
+
+	textureCoords.push_back(0.75);
+	textureCoords.push_back(1/3.0);
+
+	textureCoords.push_back(1);
+	textureCoords.push_back(2/3.0);
+
+	textureCoords.push_back(1);
+	textureCoords.push_back(1/3.0);
+	//left  	//BL BR TL, BR TL TR 
+	textureCoords.push_back(0.75);
+	textureCoords.push_back(2 / 3.0);
+
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(2 / 3.0);
+
+	textureCoords.push_back(0.75);
+	textureCoords.push_back(1 / 3.0);
+
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(2 / 3.0);
+
+	textureCoords.push_back(0.75);
+	textureCoords.push_back(1 / 3.0);
+
+
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(1 / 3.0);
+
+	//right
+	textureCoords.push_back(0);
+	textureCoords.push_back(2 / 3.0);
+
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(2 / 3.0);
+
+	textureCoords.push_back(0.);
+	textureCoords.push_back(1 / 3.0);
+
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(2 / 3.0);
+
+	textureCoords.push_back(0);
+	textureCoords.push_back(1 / 3.0);
+
+
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(1 / 3.0);
+
+	//top  	// TL BL BR, TL BR TR
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(0);
+
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(1 / 3.0);
+
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(1 / 3.0);
+
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(0);
+
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(1 / 3.0);
+
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(0);
+
+	//bottom
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(2 / 3.0);
+
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(3 / 3.0);
+
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(3 / 3.0);
+
+	textureCoords.push_back(0.25);
+	textureCoords.push_back(2 / 3.0);
+
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(3 / 3.0);
+
+	textureCoords.push_back(0.5);
+	textureCoords.push_back(2 / 3.0);
+
+	return true;
+
 }
 bool Shape::setSquare() {
 	renderType = SH_INDEX;
@@ -83,6 +209,9 @@ bool Shape::setSquare() {
 bool Shape::setCube() {
 	renderType = SH_VERTEX;
 	//front
+
+	// TL BL BR, TL BR TR
+
 	vertices.push_back(-0.5);
 	vertices.push_back(0.5);
 	vertices.push_back(0.5);
@@ -195,6 +324,8 @@ bool Shape::setCube() {
 
 	//left
 	
+	//BL BR TL, BR TL TR 
+
 	vertices.push_back(-0.5);
 	vertices.push_back(-0.5);
 	vertices.push_back(-0.5);
@@ -306,6 +437,8 @@ bool Shape::setCube() {
 	normals.push_back(0);
 
 	//top
+
+	// TL BL BR, TL BR TR
 
 	vertices.push_back(-0.5);
 	vertices.push_back(0.5);
@@ -550,7 +683,73 @@ bool Shape::setCube() {
 	return true;
 }
 bool Shape::setSphere() {
+	renderType = SH_VERTEX;
+	return true;
+}
+bool Shape::setPlane() {
+	renderType = SH_VERTEX;
+	Vector3 currentPosition = (0,0,0);
+	for (int z = -25; z < 25; z++) {
+		for (int x = -25; x < 25; x++) {
 
+			vertices.push_back(currentPosition.x + -0.5);
+			vertices.push_back(currentPosition.y + 0);
+			vertices.push_back(currentPosition.z + -0.5);
+			textureCoords.push_back(0);
+			textureCoords.push_back(0);
+			normals.push_back(0);
+			normals.push_back(1);
+			normals.push_back(0);
+
+			vertices.push_back(currentPosition.x + -0.5);
+			vertices.push_back(currentPosition.y + 0);
+			vertices.push_back(currentPosition.z + 0.5);
+			textureCoords.push_back(0);
+			textureCoords.push_back(1);
+			normals.push_back(0);
+			normals.push_back(1);
+			normals.push_back(0);
+
+			vertices.push_back(currentPosition.x + 0.5);
+			vertices.push_back(currentPosition.y + 0);
+			vertices.push_back(currentPosition.z + 0.5);
+			textureCoords.push_back(1);
+			textureCoords.push_back(1);
+			normals.push_back(0);
+			normals.push_back(1);
+			normals.push_back(0);
+
+			vertices.push_back(currentPosition.x + -0.5);
+			vertices.push_back(currentPosition.y + 0);
+			vertices.push_back(currentPosition.z + -0.5);
+			textureCoords.push_back(0);
+			textureCoords.push_back(0);
+			normals.push_back(0);
+			normals.push_back(1);
+			normals.push_back(0);
+
+			vertices.push_back(currentPosition.x + 0.5);
+			vertices.push_back(currentPosition.y + 0);
+			vertices.push_back(currentPosition.z + 0.5);
+			textureCoords.push_back(1);
+			textureCoords.push_back(1);
+			normals.push_back(0);
+			normals.push_back(1);
+			normals.push_back(0);
+
+			vertices.push_back(currentPosition.x + 0.5);
+			vertices.push_back(currentPosition.y + 0);
+			vertices.push_back(currentPosition.z + -0.5);
+			textureCoords.push_back(1);
+			textureCoords.push_back(0);
+			normals.push_back(0);
+			normals.push_back(1);
+			normals.push_back(0);
+
+			currentPosition.x = x;
+		}
+		currentPosition.z = z;
+	}
 	return true;
 }
 bool Shape::setPyramid() {

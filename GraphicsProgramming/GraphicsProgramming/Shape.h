@@ -14,7 +14,8 @@ using namespace std;
 #define SH_CUBE  0x0003
 #define SH_SQUARE  0x0004
 #define SH_PYRAMID  0x0005
-
+#define SH_SKYBOX  0x0006
+#define SH_PLANE 0x0007
 
 class Shape
 {
@@ -26,6 +27,8 @@ public:
 	bool setCube();
 	bool setSphere();
 	bool setPyramid();
+	bool setSkyBox();
+	bool setPlane();
 	void loadShape(int selectedShape);
 	void render();
 	void loadTexture(GLuint* shapeTexture) { texture = shapeTexture; };

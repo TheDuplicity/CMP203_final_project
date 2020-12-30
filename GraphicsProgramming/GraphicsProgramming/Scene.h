@@ -50,13 +50,14 @@ protected:
 	// predefined shapes
 	Shape square;
 	Shape skyBox;
-	Shape example;
+	Shape floor;
 
 	// textures
 
 	GLuint* defaultTexture;
 	GLuint skyBoxTexture;
 	GLuint secondTexture;
+	GLuint floorTexture;
 
 	// lighting
 
