@@ -1,18 +1,42 @@
 #include "Shape.h"
 Shape::Shape() {
+	renderType = SH_INDEX;
 	//drawPyramid();
-	drawCube();
+	//drawCube();
 	//drawSquare();
+	texture = NULL;
 
 }
 Shape::Shape(GLuint* inpTexture) {
+	renderType = SH_INDEX;
 	//drawPyramid();
-	drawCube();
+	setCube();
 	//drawSquare();
 	texture = inpTexture;
 
 }
-bool Shape::drawSquare() {
+void Shape::loadShape(int selectedShape) {
+	vertices.clear();
+	normals.clear();
+	textureCoords.clear();
+	indeces.clear();
+	switch (selectedShape)
+	{
+	case SH_SQUARE:
+		setSquare();
+		break;
+	case SH_CUBE:
+		setCube();
+		break;
+	case SH_PYRAMID:
+		setPyramid();
+		break;
+	default:
+		break;
+	}
+}
+bool Shape::setSquare() {
+	renderType = SH_INDEX;
 	vertices.push_back(-0.5);
 	vertices.push_back(-0.5);
 	vertices.push_back(0);
@@ -56,7 +80,183 @@ bool Shape::drawSquare() {
 	normals.push_back(1);
 	return true;
 }
-bool Shape::drawCube() {
+bool Shape::setCube() {
+	renderType = SH_VERTEX;
+	//front
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+
+	//back
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+
+
+	/*
+	//back
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+
+	//left
+
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+
+	//right
+
+
+
+	//top
+
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+
+	//bottom
+
+	*/
+
+	/* cube via indeces
 	// front incices
 	vertices.push_back(-0.5);
 	vertices.push_back(-0.5);
@@ -183,14 +383,16 @@ bool Shape::drawCube() {
 	indeces.push_back(3); // above
 	indeces.push_back(6);
 	indeces.push_back(7);
+	*/
 	
 	return true;
 }
-bool Shape::drawSphere() {
+bool Shape::setSphere() {
 
 	return true;
 }
-bool Shape::drawPyramid() {
+bool Shape::setPyramid() {
+	renderType = SH_INDEX;
 	vertices.push_back(-0.5);
 	vertices.push_back(-0.5);
 	vertices.push_back(0.5);
@@ -271,23 +473,30 @@ bool Shape::drawPyramid() {
 void Shape::render() {
 
 
+	if (texture != nullptr) {
+		glBindTexture(GL_TEXTURE_2D, *texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glBindTexture(GL_TEXTURE_2D, *texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
+		glNormalPointer(GL_FLOAT, 0, &normals[0]);
+		glTexCoordPointer(2, GL_FLOAT, 0, &textureCoords[0]);
 
-	glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
-	glNormalPointer(GL_FLOAT, 0, &normals[0]);
-	glTexCoordPointer(2, GL_FLOAT, 0, &textureCoords[0]);
+		if (renderType == SH_INDEX) {
+			glDrawElements(GL_TRIANGLES, indeces.size(), GL_UNSIGNED_INT, &indeces[0]);
+		}
+		else if (renderType == SH_VERTEX) {
+			glDrawArrays(GL_TRIANGLES, 0, vertices.size()/3);
+		}
 
-	glDrawElements(GL_TRIANGLES, indeces.size(), GL_UNSIGNED_INT, &indeces[0]);
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
 
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 }

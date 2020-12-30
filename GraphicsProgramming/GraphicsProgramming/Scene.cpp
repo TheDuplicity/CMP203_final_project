@@ -63,6 +63,14 @@ Scene::Scene(Input *in)
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
 	);
 
+	secondTexture = SOIL_load_OGL_texture
+	(
+		"gfx/bluered.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+	);
+
 	defaultTexture = &skyBoxTexture;
 	// Initialise scene variables
 	teapot.load("models/teapot.obj","gfx/crate.png");
@@ -70,6 +78,13 @@ Scene::Scene(Input *in)
 	cameraSpeed = 2;
 	glutSetCursor(GLUT_CURSOR_NONE);
 	cameraCurrent->update();
+
+	square.loadTexture(&secondTexture);
+	square.loadShape(SH_PYRAMID);
+	skyBox.loadTexture(&secondTexture);
+	skyBox.loadShape(SH_CUBE);
+	example.loadTexture(&skyBoxTexture);
+	example.loadShape(SH_SQUARE);
 }
 
 
@@ -124,6 +139,20 @@ void Scene::handleInput(float dt)
 		cameraCurrent->update();
 	}
 
+	if (input->isKeyDown('l')) {
+		cameraCurrent = &secondCamera;
+	}
+	if (input->isKeyDown('o')) {
+		cameraCurrent = &cameraPlayer1P;
+	}
+	if (input->isKeyDown('o')) {
+		//square.loadTexture(&skyBoxTexture);
+		square.loadShape(SH_CUBE);
+	}
+	else {
+		//square.loadTexture(&secondTexture);
+		square.loadShape(SH_SQUARE);
+	}
 	glutWarpPointer(width / 2.0, height / 2.0);
 }
 
@@ -236,6 +265,9 @@ void Scene::render() {
 
 	glTranslatef(0,2,0);
 	square.render();
+
+	glTranslatef(5,0,0);
+	example.render();
 
 
 	// End render geometry --------------------------------------

@@ -47,13 +47,16 @@ protected:
 
 
 
-	// predefined shaoes
+	// predefined shapes
 	Shape square;
+	Shape skyBox;
+	Shape example;
 
 	// textures
 
 	GLuint* defaultTexture;
 	GLuint skyBoxTexture;
+	GLuint secondTexture;
 
 	// lighting
 
@@ -70,11 +73,8 @@ protected:
 
 	Camera* cameraCurrent;
 	Camera cameraPlayer1P;
+	Camera secondCamera;
 	GLfloat cameraSpeed;
-
-	// shapes
-
-	Shape skyBox;
 
 	// materials
 
