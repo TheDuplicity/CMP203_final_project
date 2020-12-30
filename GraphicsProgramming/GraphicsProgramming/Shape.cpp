@@ -146,7 +146,7 @@ bool Shape::setCube() {
 	textureCoords.push_back(0);
 	normals.push_back(0);
 	normals.push_back(0);
-	normals.push_back(1);
+	normals.push_back(-1);
 
 	vertices.push_back(-0.5);
 	vertices.push_back(-0.5);
@@ -155,7 +155,7 @@ bool Shape::setCube() {
 	textureCoords.push_back(1);
 	normals.push_back(0);
 	normals.push_back(0);
-	normals.push_back(1);
+	normals.push_back(-1);
 
 	vertices.push_back(0.5);
 	vertices.push_back(-0.5);
@@ -164,7 +164,7 @@ bool Shape::setCube() {
 	textureCoords.push_back(1);
 	normals.push_back(0);
 	normals.push_back(0);
-	normals.push_back(1);
+	normals.push_back(-1);
 
 	vertices.push_back(-0.5);
 	vertices.push_back(0.5);
@@ -173,7 +173,7 @@ bool Shape::setCube() {
 	textureCoords.push_back(0);
 	normals.push_back(0);
 	normals.push_back(0);
-	normals.push_back(1);
+	normals.push_back(-1);
 
 	vertices.push_back(0.5);
 	vertices.push_back(-0.5);
@@ -182,7 +182,7 @@ bool Shape::setCube() {
 	textureCoords.push_back(1);
 	normals.push_back(0);
 	normals.push_back(0);
-	normals.push_back(1);
+	normals.push_back(-1);
 
 	vertices.push_back(0.5);
 	vertices.push_back(0.5);
@@ -191,70 +191,232 @@ bool Shape::setCube() {
 	textureCoords.push_back(0);
 	normals.push_back(0);
 	normals.push_back(0);
-	normals.push_back(1);
-
-
-	/*
-	//back
-	vertices.push_back(-0.5);
-	vertices.push_back(-0.5);
-	vertices.push_back(-0.5);
-
-	vertices.push_back(0.5);
-	vertices.push_back(-0.5);
-	vertices.push_back(-0.5);
-
-	vertices.push_back(-0.5);
-	vertices.push_back(0.5);
-	vertices.push_back(-0.5);
-
-	vertices.push_back(0.5);
-	vertices.push_back(0.5);
-	vertices.push_back(-0.5);
+	normals.push_back(-1);
 
 	//left
-
+	
 	vertices.push_back(-0.5);
 	vertices.push_back(-0.5);
 	vertices.push_back(-0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(1);
+	normals.push_back(-1);
+	normals.push_back(0);
+	normals.push_back(0);
 
 	vertices.push_back(-0.5);
 	vertices.push_back(-0.5);
 	vertices.push_back(0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(1);
+	normals.push_back(-1);
+	normals.push_back(0);
+	normals.push_back(0);
 
 	vertices.push_back(-0.5);
 	vertices.push_back(0.5);
 	vertices.push_back(-0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(0);
+	normals.push_back(-1);
+	normals.push_back(0);
+	normals.push_back(0);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(1);
+	normals.push_back(-1);
+	normals.push_back(0);
+	normals.push_back(0);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(0);
+	normals.push_back(-1);
+	normals.push_back(0);
+	normals.push_back(0);
 
 	vertices.push_back(-0.5);
 	vertices.push_back(0.5);
 	vertices.push_back(0.5);
-
+	textureCoords.push_back(1);
+	textureCoords.push_back(0);
+	normals.push_back(-1);
+	normals.push_back(0);
+	normals.push_back(0);
+	
 	//right
 
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(1);
+	normals.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
 
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(1);
+	normals.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
+
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
+
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(1);
+	normals.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
+
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
+
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
+	normals.push_back(0);
 
 	//top
 
 	vertices.push_back(-0.5);
 	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
+
+	vertices.push_back(-0.5);
 	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
 
 	vertices.push_back(0.5);
 	vertices.push_back(0.5);
 	vertices.push_back(0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
 
 	vertices.push_back(-0.5);
 	vertices.push_back(0.5);
 	vertices.push_back(-0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
+
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
 
 	vertices.push_back(0.5);
 	vertices.push_back(0.5);
 	vertices.push_back(-0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
 
 	//bottom
 
-	*/
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
+
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
+
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(1);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
+
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(1);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
+
+	vertices.push_back(0.5);
+	vertices.push_back(-0.5);
+	vertices.push_back(-0.5);
+	textureCoords.push_back(0);
+	textureCoords.push_back(0);
+	normals.push_back(0);
+	normals.push_back(1);
+	normals.push_back(0);
+
 
 	/* cube via indeces
 	// front incices
