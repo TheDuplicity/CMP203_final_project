@@ -19,7 +19,7 @@ Scene::Scene(Input *in)
 	glPolygonMode(GL_BACK, GL_FILL);
 
 		// DEPTH TESTING
-
+	
 	glDepthFunc(GL_LEQUAL);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -32,6 +32,7 @@ Scene::Scene(Input *in)
 	glEdgeFlag(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	
 
 	// lighting
 
@@ -79,9 +80,17 @@ Scene::Scene(Input *in)
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
 	);
 
-	floorTexture = SOIL_load_OGL_texture
+	ceilingTexture = SOIL_load_OGL_texture
 	(
 		"gfx/floorTexture.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+	);
+
+	floorTexture = SOIL_load_OGL_texture
+	(
+		"gfx/grass.png",
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
@@ -91,29 +100,137 @@ Scene::Scene(Input *in)
 	// Initialise scene variables
 	teapot.load("models/teapot.obj","gfx/floorTexture.png");
 	cameraCurrent = &cameraPlayer1P;
-	cameraSpeed = 20;
+	cameraSpeed = 8;
 	glutSetCursor(GLUT_CURSOR_NONE);
 	cameraCurrent->update();
 
-	square.loadTexture(&secondTexture);
-	square.loadShape(SH_PYRAMID);
+	tempRotate = 0;
+	mirrorPosition.x = 5.0;
+	shadowCheck = 0;
+	userInputSelect = 1;
+
+	//sort out shapes
+
+	square.loadTexture(&skyBoxTexture);
+	square.loadShape(SH_SKYBOX);
+	square.loadColour(1, 1, 1, 1);
 	skyBox.loadTexture(&skyBoxTexture);
 	skyBox.loadShape(SH_SKYBOX);
 	floor.loadTexture(&floorTexture);
 	floor.loadShape(SH_PLANE);
+	ceiling.loadTexture(&ceilingTexture);
+	ceiling.loadShape(SH_PLANE);
+	light.loadShape(SH_PYRAMID);
+	light.loadTexture(&secondTexture);
+	mirror.loadShape(SH_SQUARE);
+	mirror.loadTexture(&secondTexture);
+	mirror.loadColour(0.85, 0.85, 0.85, 0.5);
 }
 
+void Scene::renderShadows() {
+	shadowCheck = 1;
+	glPushMatrix();
+	glEnable(GL_COLOR_MATERIAL);
+	//glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glColor4f(lightDiffuse[0] / 5.0, lightDiffuse[1] / 5.0, lightDiffuse[2] / 5.0, 0.1f);
+	glTranslatef(0,0.05,0);
+	shadow.generateShadowMatrix(shadowMatrix, lightPosition, floorCorners);
+	glMultMatrixf((GLfloat*)shadowMatrix);
+	renderScene();
+
+	glColor4f(1.0f, 1.0f, 1.0f,1.f);
+	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	glDisable(GL_COLOR_MATERIAL);
+
+	glPopMatrix();
+	shadowCheck = 0;
+}
+
+void Scene::renderScene() {
+
+	glPushMatrix();
+	glTranslatef(2.5, 0, 0);
+	glScalef(0.1, 0.1, 0.1);
+	glRotatef(tempRotate,0,1,0);
+	teapot.render();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0, 2, 0);
+	glEnable(GL_BLEND);
+	square.render();
+	glDisable(GL_BLEND);
+	glPopMatrix();
+
+	if (shadowCheck == 0) {
+		glPushMatrix();
+		glTranslatef(lightPosition[0], lightPosition[1], lightPosition[2]);
+		glScalef(0.1, 0.1, 0.1);
+		light.render();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, -3, 0);
+		glScalef(5, 5, 5);
+		floor.render();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 5, 0);
+		glScalef(5, 5, 5);
+		ceiling.render();
+		glPopMatrix();
+	}
+
+	
+
+}
+
+void Scene::drawMirrorWorld() {
+	// setup stencil
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 1, 1);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glDisable(GL_DEPTH_TEST);
+
+	//draw the stencil
+	glPushMatrix();
+	glTranslatef(mirrorPosition.x, mirrorPosition.y, mirrorPosition.z);
+	glScalef(7, 7, 7);
+	glRotatef(-90, 0, 1, 0);
+	mirror.render();
+	glPopMatrix();
+
+	//set everything back to normal except the stencil so the next objects will be written in the stencil world
+	glEnable(GL_DEPTH_TEST);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glStencilFunc(GL_EQUAL, 1, 1);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
 
-void Scene::handleInput(float dt)
-{
+
+	//translate double the distance of the mirror to the origin to have the scene drawn on the opposite side then draw the scene
+	glPushMatrix();
+	glTranslatef(mirrorPosition.x * 2.0, 0, 0);
+	glScalef(-1, 1, 1);
+	renderScene();
+	renderShadows();
+	glPopMatrix();
 
 
-	// Handle user input
 
+	glDisable(GL_STENCIL_TEST);
+}
+
+void Scene::userInputCamera(float dt) {
 	//rotation pitch(x) yaw(y) roll(z)
-	if (input->getMouseX() > (width/2.0) || input->getMouseX() < (width / 2.0)) {
-		cameraCurrent->setYaw(cameraCurrent->getYaw() + ((input->getMouseX() - (width / 2.0 ))*dt * cameraCurrent->getRotSpeed().x));
+	if (input->getMouseX() > (width / 2.0) || input->getMouseX() < (width / 2.0)) {
+		cameraCurrent->setYaw(cameraCurrent->getYaw() + ((input->getMouseX() - (width / 2.0)) * dt * cameraCurrent->getRotSpeed().x));
 		cameraCurrent->update();
 	}
 	if (input->getMouseY() > (height / 2.0) || input->getMouseY() < (height / 2.0)) {
@@ -155,20 +272,54 @@ void Scene::handleInput(float dt)
 		cameraCurrent->update();
 	}
 
-	if (input->isKeyDown('l')) {
+	if (input->isKeyDown('`')) {
 		cameraCurrent = &secondCamera;
 	}
 	if (input->isKeyDown('o')) {
 		cameraCurrent = &cameraPlayer1P;
 	}
-	if (input->isKeyDown('o')) {
-		//square.loadTexture(&skyBoxTexture);
-		//floor.loadShape(SH_PLANE);
+}
+void Scene::userInputLight(float dt) {
+	if (input->isKeyDown('w')) {
+		lightPosition[1] += 1 * dt;
 	}
-	else {
-		//square.loadTexture(&secondTexture);
-		//floor.loadShape(SH_CUBE);
+	if (input->isKeyDown('s')) {
+		lightPosition[1] -= 1 * dt;
 	}
+	if (input->isKeyDown('d')) {
+		lightPosition[0] += 1 * dt;
+	}
+	if (input->isKeyDown('a')) {
+		lightPosition[0] -= 1 * dt;
+	}
+
+}
+
+void Scene::handleInput(float dt)
+{
+
+	switch (userInputSelect)
+	{
+		case 1:
+			userInputCamera(dt);
+			break;
+		case 2:
+			userInputLight(dt);
+			break;
+	default:
+		break;
+	}
+
+	// Handle user input
+
+
+	if (input->isKeyDown('1')) {
+		userInputSelect = 1;
+	}
+	else if (input->isKeyDown('2')) {
+		userInputSelect = 2;
+	}
+
 	glutWarpPointer(width / 2.0, height / 2.0);
 }
 
@@ -176,15 +327,14 @@ void Scene::update(float dt)
 {
 	// update scene related variables.
 	// Calculate FPS for output
+	tempRotate += 90 * dt;
 	calculateFPS();
 }
 
 void Scene::render() {
 	
-	
-
 	// Clear Color and Depth Buffers
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	// Reset transformations
 	glLoadIdentity();
@@ -196,6 +346,15 @@ void Scene::render() {
 	
 	// Render geometry/scene here -------------------------------------
 
+	glBindTexture(GL_TEXTURE_2D, *defaultTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, matDiffAndAmb);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
+	glMateriali(GL_FRONT, GL_SHININESS, matShininess);
+	glMaterialfv(GL_FRONT, GL_EMISSION, matEmission);
+
 		//skybox
 	glPushMatrix();
 	glDisable(GL_DEPTH_TEST);
@@ -204,92 +363,27 @@ void Scene::render() {
 	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
 
-	glBindTexture(GL_TEXTURE_2D, *defaultTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	
+
+	if (cameraCurrent->getPosition().x < mirrorPosition.x) {
+		drawMirrorWorld();
+	}
+
+	renderScene();
+
+	renderShadows();
+
+	//draw physical mirror
 	glPushMatrix();
-	glTranslatef(2.5,0,0);
-	glScalef(0.1,0.1,0.1);
-	teapot.render();
+	glTranslatef(mirrorPosition.x, mirrorPosition.y, mirrorPosition.z);
+	glScalef(7, 7, 7);
+	glRotatef(-90, 0, 1, 0);
+	glEnable(GL_BLEND);
+	glDisable(GL_TEXTURE_2D);
+	mirror.render();
+	glEnable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
 	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(lightPosition[0], lightPosition[1], lightPosition[2]);
-	glScalef(0.1,0.1,0.1);
-	glBegin(GL_TRIANGLE_STRIP);
-	glTexCoord2d(0, 1);
-	glVertex3f(-0.5, -0.5, 0);
-	glNormal3f(0, 0, 1);
-
-	glTexCoord2d(1, 1);
-	glVertex3f(0.5, -0.5, 0);
-	glNormal3f(0, 0, 1);
-
-	glTexCoord2d(0, 0);
-	glVertex3f(-0.5, 0.5, 0);
-	glNormal3f(0, 0, 1);
-
-	glTexCoord2d(1, 0);
-	glVertex3f(0.5, 0.5, 0);
-	glNormal3f(0, 0, 1);
-	glEnd();
-	glPopMatrix();
-
-	//glTranslatef(transl[1], transl[0], transl[2]);
-
-	glBegin(GL_TRIANGLE_STRIP);
-	glTexCoord2d(0, 1);
-	glVertex3f(-0.5, -0.5, 0);
-	glNormal3f(0, 0, 1);
-
-	glTexCoord2d(1, 1);
-	glVertex3f(0.5, -0.5, 0);
-	glNormal3f(0, 0, 1);
-
-	glTexCoord2d(0, 0);
-	glVertex3f(-0.5, 0.5, 0);
-	glNormal3f(0, 0, 1);
-
-	glTexCoord2d(1, 0);
-	glVertex3f(0.5, 0.5, 0);
-	glNormal3f(0, 0, 1);
-	glEnd();
-	
-	/*
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glVertexPointer(3, GL_FLOAT, 0, &verts[0]);
-	glNormalPointer(GL_FLOAT, 0, normals);
-	glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-
-		
-		glBegin(GL_TRIANGLE_STRIP);
-		glArrayElement(0);
-		glArrayElement(1);
-		glArrayElement(2);
-		glArrayElement(3);
-		glEnd();
-		
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, index);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	*/
-	glPushMatrix();
-	glTranslatef(0,2,0);
-	square.render();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(0,-3,0);
-	glScalef(5,5,5);
-	floor.render();
-	glPopMatrix();
-
+	 
 	// End render geometry --------------------------------------
 
 	// Render text, should be last object rendered.

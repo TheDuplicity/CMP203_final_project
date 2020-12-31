@@ -17,6 +17,7 @@ using namespace std;
 #define SH_SKYBOX  0x0006
 #define SH_PLANE 0x0007
 
+
 class Shape
 {
 
@@ -32,6 +33,7 @@ public:
 	void loadShape(int selectedShape);
 	void render();
 	void loadTexture(GLuint* shapeTexture) { texture = shapeTexture; };
+	void loadColour(float r, float g, float b, float a);
 
 private:
 

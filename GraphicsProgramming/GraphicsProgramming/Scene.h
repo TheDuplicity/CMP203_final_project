@@ -18,6 +18,7 @@
 #include "Model.h"
 #include "Camera.h"
 #include "Shape.h"
+#include "Shadow.h"
 
 
 class Scene {
@@ -45,12 +46,22 @@ protected:
 
 	// draw primitive variables?
 
+	void drawMirrorWorld();
+	void renderScene();
+	void renderShadows();
+	void userInputCamera(float dt);
+	void userInputLight(float dt);
 
+	//shadows
+	Shadow shadow;
 
 	// predefined shapes
 	Shape square;
 	Shape skyBox;
 	Shape floor;
+	Shape light;
+	Shape mirror;
+	Shape ceiling;
 
 	// textures
 
@@ -58,12 +69,13 @@ protected:
 	GLuint skyBoxTexture;
 	GLuint secondTexture;
 	GLuint floorTexture;
+	GLuint ceilingTexture;
 
 	// lighting
 
-	GLfloat lightDiffuse[4]{ 0.5f,0.5f,0.5f,1.f };
+	GLfloat lightDiffuse[4]{ 0.7f,0.4f,0.4f,1.f };
 	GLfloat lightAmbient[4]{ 0.f,0.f,0.f,0.f };
-	GLfloat lightPosition[4]{ 0.f,0.f,0.f,1.f };
+	GLfloat lightPosition[4]{ 3.f,3.f,0.f,1.f };
 	GLfloat lightSpot[4]{};
 
 	// models
@@ -87,8 +99,25 @@ protected:
 
 	// random
 
+	float tempRotate;
+	Vector3 mirrorPosition = (5.0,0.0,0.0);
+	int shadowCheck;
+	int userInputSelect;
 
+	GLfloat floorCorners[12] = {
+		-25, -3, 25,
+		25, -3, 25,
+		25, -3, -25,
+		-25, -3, -25
+	};
+	GLfloat ceilingCorners[12] = {
+		-25, 5, 25,
+		25, 5, 25,
+		25, 5, -25,
+		-25, 5, -25
+	};
 
+	GLfloat shadowMatrix[16];
 
 	// For access to user input.
 	Input* input;

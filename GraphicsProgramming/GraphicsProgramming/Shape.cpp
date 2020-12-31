@@ -5,6 +5,11 @@ Shape::Shape() {
 	//drawCube();
 	//drawSquare();
 	texture = NULL;
+	for (int i = 0; i < 4; i++)
+	{
+		materialColour[i] = 1.f;
+	}
+
 
 }
 Shape::Shape(GLuint* inpTexture) {
@@ -40,6 +45,13 @@ void Shape::loadShape(int selectedShape) {
 	default:
 		break;
 	}
+}
+void Shape::loadColour(float r, float g, float b, float a) {
+	materialColour[0] = r;
+	materialColour[1] = g;
+	materialColour[2] = b;
+	materialColour[3] = a;
+	
 }
 bool Shape::setSkyBox() {
 	setCube();
@@ -835,6 +847,8 @@ void Shape::render() {
 
 
 	if (texture != nullptr) {
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, materialColour);
+
 		glBindTexture(GL_TEXTURE_2D, *texture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
