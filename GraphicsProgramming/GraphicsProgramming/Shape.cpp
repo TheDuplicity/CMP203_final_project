@@ -9,7 +9,8 @@ Shape::Shape() {
 	{
 		materialColour[i] = 1.f;
 	}
-
+	isTransparent = false;
+	isTextured = true;
 
 }
 Shape::Shape(GLuint* inpTexture) {
@@ -844,7 +845,15 @@ bool Shape::setPyramid() {
 }
 
 void Shape::render() {
-
+	if(isTransparent){
+		glEnable(GL_BLEND);
+	}
+	if (isTextured) {
+		glEnable(GL_TEXTURE_2D);
+	}
+	else {
+		glDisable(GL_TEXTURE_2D);
+	}
 
 	if (texture != nullptr) {
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, materialColour);
@@ -872,6 +881,11 @@ void Shape::render() {
 		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
-
+	if (isTransparent) {
+		glDisable(GL_BLEND);
+	}
+	if (!isTextured) {
+		glEnable(GL_TEXTURE_2D);
+	}
 
 }

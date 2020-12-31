@@ -34,12 +34,15 @@ public:
 	void render();
 	void loadTexture(GLuint* shapeTexture) { texture = shapeTexture; };
 	void loadColour(float r, float g, float b, float a);
+	void setIsTransparent(bool inputTransparent) { isTransparent = inputTransparent; };
+	void setIsTextured(bool inputTextured) { isTextured = inputTextured; };
 
 private:
 
 	GLuint* texture;
 	float materialColour[4];
 	bool isTransparent;
+	bool isTextured;
 	int renderType;
 
 

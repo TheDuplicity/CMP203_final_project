@@ -19,6 +19,7 @@
 #include "Camera.h"
 #include "Shape.h"
 #include "Shadow.h"
+#include "Light.h"
 
 
 class Scene {
@@ -70,8 +71,11 @@ protected:
 	GLuint secondTexture;
 	GLuint floorTexture;
 	GLuint ceilingTexture;
+	GLuint mirrorTexture;
+	
+	// Lights
 
-	// lighting
+	Light mainLight;
 
 	GLfloat lightDiffuse[4]{ 0.7f,0.4f,0.4f,1.f };
 	GLfloat lightAmbient[4]{ 0.f,0.f,0.f,0.f };

@@ -10,6 +10,11 @@ Scene::Scene(Input *in)
 
 	// Other OpenGL / render setting should be applied here.
 
+	// set mipmap linear for anti aliasing
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
 	// wireframe and fill modes
 
 	//glPolygonMode(GL_FRONT, GL_LINE);
@@ -39,6 +44,8 @@ Scene::Scene(Input *in)
 	glDisable(GL_COLOR_MATERIAL);
 	glEnable(GL_LIGHTING);
 
+	mainLight.setLightPosition(new GLfloat[4]{ -10,3,1,1 });
+
 	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.2);
 	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
 	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.05);
@@ -46,7 +53,7 @@ Scene::Scene(Input *in)
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+	glLightfv(GL_LIGHT0, GL_POSITION, mainLight.getLightPosition());
 	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 25.0f);
 	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, lightSpot);
 	//glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 50.0);
@@ -96,6 +103,14 @@ Scene::Scene(Input *in)
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
 	);
 
+	mirrorTexture = SOIL_load_OGL_texture
+	(
+		"gfx/mirrorTexture.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+	);
+
 	defaultTexture = &skyBoxTexture;
 	// Initialise scene variables
 	teapot.load("models/teapot.obj","gfx/floorTexture.png");
@@ -114,6 +129,7 @@ Scene::Scene(Input *in)
 	square.loadTexture(&skyBoxTexture);
 	square.loadShape(SH_SKYBOX);
 	square.loadColour(1, 1, 1, 1);
+	square.setIsTransparent(true);
 	skyBox.loadTexture(&skyBoxTexture);
 	skyBox.loadShape(SH_SKYBOX);
 	floor.loadTexture(&floorTexture);
@@ -123,8 +139,14 @@ Scene::Scene(Input *in)
 	light.loadShape(SH_PYRAMID);
 	light.loadTexture(&secondTexture);
 	mirror.loadShape(SH_SQUARE);
-	mirror.loadTexture(&secondTexture);
-	mirror.loadColour(0.85, 0.85, 0.85, 0.5);
+	mirror.loadTexture(&mirrorTexture);
+	mirror.loadColour(0.3, 0.3, 0.85, 0.65);
+	mirror.setIsTransparent(true);
+	mirror.setIsTextured(true);
+
+	//sort out lights
+	mainLight.setLightDiffuse(new GLfloat[4]{ 1,1,1,1 });
+	//mainLight.setLightPosition(new GLfloat[4]{ 1,1,1,1 });
 }
 
 void Scene::renderShadows() {
@@ -134,17 +156,27 @@ void Scene::renderShadows() {
 	//glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
-	glColor4f(lightDiffuse[0] / 5.0, lightDiffuse[1] / 5.0, lightDiffuse[2] / 5.0, 0.1f);
-	glTranslatef(0,0.05,0);
+	glEnable(GL_BLEND);
+	glColor4f(lightDiffuse[0] / 5.0, lightDiffuse[1] / 5.0, lightDiffuse[2] / 5.0, .4f);
+	glTranslatef(0,0.1,0);
 	shadow.generateShadowMatrix(shadowMatrix, lightPosition, floorCorners);
 	glMultMatrixf((GLfloat*)shadowMatrix);
 	renderScene();
+
+	//render the mirrors shadow too
+	glPushMatrix();
+	glTranslatef(mirrorPosition.x, mirrorPosition.y, mirrorPosition.z);
+	glScalef(7, 7, 7);
+	glRotatef(-90, 0, 1, 0);
+	mirror.render();
+	glPopMatrix();
 
 	glColor4f(1.0f, 1.0f, 1.0f,1.f);
 	//glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_COLOR_MATERIAL);
+	glDisable(GL_BLEND);
 
 	glPopMatrix();
 	shadowCheck = 0;
@@ -161,9 +193,7 @@ void Scene::renderScene() {
 
 	glPushMatrix();
 	glTranslatef(0, 2, 0);
-	glEnable(GL_BLEND);
 	square.render();
-	glDisable(GL_BLEND);
 	glPopMatrix();
 
 	if (shadowCheck == 0) {
@@ -292,6 +322,12 @@ void Scene::userInputLight(float dt) {
 	if (input->isKeyDown('a')) {
 		lightPosition[0] -= 1 * dt;
 	}
+	if (input->isKeyDown('q')) {
+		lightPosition[2] += 1 * dt;
+	}
+	if (input->isKeyDown('e')) {
+		lightPosition[2] -= 1 * dt;
+	}
 
 }
 
@@ -370,19 +406,17 @@ void Scene::render() {
 
 	renderScene();
 
-	renderShadows();
 
 	//draw physical mirror
 	glPushMatrix();
 	glTranslatef(mirrorPosition.x, mirrorPosition.y, mirrorPosition.z);
 	glScalef(7, 7, 7);
 	glRotatef(-90, 0, 1, 0);
-	glEnable(GL_BLEND);
-	glDisable(GL_TEXTURE_2D);
 	mirror.render();
-	glEnable(GL_TEXTURE_2D);
-	glDisable(GL_BLEND);
 	glPopMatrix();
+
+	renderShadows();
+
 	 
 	// End render geometry --------------------------------------
 
