@@ -4,6 +4,9 @@ class Light
 {
 public:
 	Light();
+
+	void render();
+
 	void setThisLight(float newLight) { thisLight = newLight; };
 
 	void setLightDiffuse(GLfloat inpLightDiffuse[]) { 
@@ -32,13 +35,27 @@ public:
 		}
 	};
 
+	void setConstantAttenuation(GLfloat inputConstantAttenuation) { constantAttenuation = inputConstantAttenuation; };
+	void setLinearAttenuation(GLfloat inputLinearAttenuation) { linearAttenuation = inputLinearAttenuation; };
+	void setQuadraticAttenuation(GLfloat inputQuadraticAttenuation) { quadraticAttenuation = inputQuadraticAttenuation; };
+
+	void applyLightParameters(bool spotLight);
+
+	void setUpLightBulb(GLuint *texture, int shape, GLfloat colour[], bool isTransparent, bool isTextured);
+
 	GLfloat* getLightDiffuse() {return lightDiffuse; };
 	GLfloat* getLightPosition() { return lightPosition; };
+	GLfloat* getLightAmbient() { return lightAmbient; };
+	GLfloat* getLightSpot() { return lightSpot; };
 private:
 	GLfloat lightDiffuse[4];
 	GLfloat lightAmbient[4];
 	GLfloat lightPosition[4];
 	GLfloat lightSpot[4];
+	GLfloat constantAttenuation;
+	GLfloat linearAttenuation;
+	GLfloat quadraticAttenuation;
 	GLuint thisLight;
+	Shape lightBulb;
 };
 

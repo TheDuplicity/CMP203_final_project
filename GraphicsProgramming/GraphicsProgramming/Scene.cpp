@@ -44,19 +44,6 @@ Scene::Scene(Input *in)
 	glDisable(GL_COLOR_MATERIAL);
 	glEnable(GL_LIGHTING);
 
-	mainLight.setLightPosition(new GLfloat[4]{ -10,3,1,1 });
-
-	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.2);
-	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
-	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.05);
-	glEnable(GL_LIGHT0);
-
-	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, mainLight.getLightPosition());
-	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 25.0f);
-	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, lightSpot);
-	//glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 50.0);
 
 	//materials
 
@@ -144,9 +131,21 @@ Scene::Scene(Input *in)
 	mirror.setIsTransparent(true);
 	mirror.setIsTextured(true);
 
-	//sort out lights
-	mainLight.setLightDiffuse(new GLfloat[4]{ 1,1,1,1 });
-	//mainLight.setLightPosition(new GLfloat[4]{ 1,1,1,1 });
+	//lights
+
+	mainLight.setLightPosition(new GLfloat[4]{ 0,0,0,1 });
+	mainLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
+	mainLight.setLightDiffuse(new GLfloat[4]{ 0.1,0.1,0.1,1 });
+	mainLight.setConstantAttenuation(0.1);
+	mainLight.setLinearAttenuation(0.1);
+	mainLight.setQuadraticAttenuation(0.1);
+
+	mainLight.setUpLightBulb(&ceilingTexture, SH_CUBE, new GLfloat[4]{1,1,1,1}, false, true);
+
+	mainLight.setThisLight(GL_LIGHT0);
+	mainLight.applyLightParameters(false);
+
+	currentLight = &mainLight;
 }
 
 void Scene::renderShadows() {
@@ -157,9 +156,9 @@ void Scene::renderShadows() {
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
-	glColor4f(lightDiffuse[0] / 5.0, lightDiffuse[1] / 5.0, lightDiffuse[2] / 5.0, .4f);
+	glColor4f(mainLight.getLightDiffuse()[0] / 5.0, mainLight.getLightDiffuse()[1] / 5.0, mainLight.getLightDiffuse()[2] / 5.0, .4f);
 	glTranslatef(0,0.1,0);
-	shadow.generateShadowMatrix(shadowMatrix, lightPosition, floorCorners);
+	shadow.generateShadowMatrix(shadowMatrix, mainLight.getLightPosition(), floorCorners);
 	glMultMatrixf((GLfloat*)shadowMatrix);
 	renderScene();
 
@@ -197,11 +196,7 @@ void Scene::renderScene() {
 	glPopMatrix();
 
 	if (shadowCheck == 0) {
-		glPushMatrix();
-		glTranslatef(lightPosition[0], lightPosition[1], lightPosition[2]);
-		glScalef(0.1, 0.1, 0.1);
-		light.render();
-		glPopMatrix();
+		mainLight.render();
 
 		glPushMatrix();
 		glTranslatef(0, -3, 0);
@@ -311,22 +306,22 @@ void Scene::userInputCamera(float dt) {
 }
 void Scene::userInputLight(float dt) {
 	if (input->isKeyDown('w')) {
-		lightPosition[1] += 1 * dt;
+		mainLight.getLightPosition()[1] += 1 * dt;
 	}
 	if (input->isKeyDown('s')) {
-		lightPosition[1] -= 1 * dt;
+		mainLight.getLightPosition()[1] -= 1 * dt;
 	}
 	if (input->isKeyDown('d')) {
-		lightPosition[0] += 1 * dt;
+		mainLight.getLightPosition()[0] += 1 * dt;
 	}
 	if (input->isKeyDown('a')) {
-		lightPosition[0] -= 1 * dt;
+		mainLight.getLightPosition()[0] -= 1 * dt;
 	}
 	if (input->isKeyDown('q')) {
-		lightPosition[2] += 1 * dt;
+		mainLight.getLightPosition()[2] += 1 * dt;
 	}
 	if (input->isKeyDown('e')) {
-		lightPosition[2] -= 1 * dt;
+		mainLight.getLightPosition()[2] -= 1 * dt;
 	}
 
 }
@@ -416,7 +411,19 @@ void Scene::render() {
 	glPopMatrix();
 
 	renderShadows();
-
+	//
+	//
+	//
+	//
+	// MAKE A COOL MISSILE LAUNCHER OR SMTHN
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
 	 
 	// End render geometry --------------------------------------
 

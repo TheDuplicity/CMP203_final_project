@@ -76,6 +76,7 @@ protected:
 	// Lights
 
 	Light mainLight;
+	Light* currentLight;
 
 	GLfloat lightDiffuse[4]{ 0.7f,0.4f,0.4f,1.f };
 	GLfloat lightAmbient[4]{ 0.f,0.f,0.f,0.f };
