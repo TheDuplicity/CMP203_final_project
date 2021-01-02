@@ -29,7 +29,7 @@ public:
 	};
 
 	void setLightSpot(GLfloat inpLightSpot[]) {
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			lightSpot[i] = inpLightSpot[i];
 		}
@@ -51,7 +51,7 @@ private:
 	GLfloat lightDiffuse[4];
 	GLfloat lightAmbient[4];
 	GLfloat lightPosition[4];
-	GLfloat lightSpot[4];
+	GLfloat lightSpot[3];
 	GLfloat constantAttenuation;
 	GLfloat linearAttenuation;
 	GLfloat quadraticAttenuation;

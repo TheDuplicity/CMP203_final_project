@@ -850,17 +850,17 @@ void Shape::render() {
 	}
 	if (isTextured) {
 		glEnable(GL_TEXTURE_2D);
+
+		glBindTexture(GL_TEXTURE_2D, *texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 	else {
 		glDisable(GL_TEXTURE_2D);
 	}
 
-	if (texture != nullptr) {
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, materialColour);
 
-		glBindTexture(GL_TEXTURE_2D, *texture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, materialColour);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_NORMAL_ARRAY);
@@ -880,7 +880,7 @@ void Shape::render() {
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	}
+	
 	if (isTransparent) {
 		glDisable(GL_BLEND);
 	}

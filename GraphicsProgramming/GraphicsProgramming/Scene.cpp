@@ -28,7 +28,7 @@ Scene::Scene(Input *in)
 	glDepthFunc(GL_LEQUAL);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	//stencil stuff
+	//to ensure stencil is working properly
 
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.39f, 0.58f, 93.0f, 1.0f);
@@ -57,6 +57,13 @@ Scene::Scene(Input *in)
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
+	wallTexture = SOIL_load_OGL_texture
+	(
+		"gfx/wallTexture.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+	);
 
 	skyBoxTexture = SOIL_load_OGL_texture
 	(
@@ -100,16 +107,38 @@ Scene::Scene(Input *in)
 
 	defaultTexture = &skyBoxTexture;
 	// Initialise scene variables
-	teapot.load("models/teapot.obj","gfx/floorTexture.png");
-	cameraCurrent = &cameraPlayer1P;
-	cameraSpeed = 8;
-	glutSetCursor(GLUT_CURSOR_NONE);
-	cameraCurrent->update();
 
+	glutSetCursor(GLUT_CURSOR_NONE);
 	tempRotate = 0;
+	swordRotation = 0;
+	swordOrbit = 0;
+
 	mirrorPosition.x = 5.0;
+	mirrorPosition.y = 2.0;
 	shadowCheck = 0;
 	userInputSelect = 1;
+
+	newShape = 1;
+	swapShapeTimer = 0;
+
+	//cameras
+
+	cameraCurrent = &cameraPlayer1P;
+	cameraSpeed = 10;
+	cameraCurrent->update();
+	cameraPlayer1P.setPosition(Vector3(cameraPlayer1P.getPosition().x, cameraPlayer1P.getPosition().y + 5, cameraPlayer1P.getPosition().x));
+	swordCamera.setPosition(Vector3(-20, 8, -3));
+	swordCamera.update();
+	swordCameraFixed = false;
+
+	cameraPlayer1P.update();
+	cameraPlayer3P.update();
+
+	//models
+	table.load("models/table.obj", "models/Wood_Table_C.jpg");
+	teapot.load("models/teapot.obj", "gfx/floorTexture.png");
+	sword.load("models/sword.obj", "models/Sting_Base_Color.png");
+	flashLightModel.load("models/flashLight.obj", "gfx/mirrorTexture.png");
 
 	//sort out shapes
 
@@ -123,15 +152,50 @@ Scene::Scene(Input *in)
 	floor.loadShape(SH_PLANE);
 	ceiling.loadTexture(&ceilingTexture);
 	ceiling.loadShape(SH_PLANE);
-	light.loadShape(SH_PYRAMID);
-	light.loadTexture(&secondTexture);
 	mirror.loadShape(SH_SQUARE);
 	mirror.loadTexture(&mirrorTexture);
 	mirror.loadColour(0.3, 0.3, 0.85, 0.65);
 	mirror.setIsTransparent(true);
 	mirror.setIsTextured(true);
+	shapeChanger.loadColour(0.5, 0.5, 0.5, 1.f);
+	shapeChanger.loadShape(SH_SQUARE);
+	shapeChanger.setIsTextured(false);
+	wall.loadTexture(&wallTexture);
+	wall.loadShape(SH_PLANE);
+	wall.setIsTextured(true);
 
 	//lights
+	mainLight.setLightPosition(new GLfloat[4]{ 0,0,0,1 });
+	mainLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
+	mainLight.setLightDiffuse(new GLfloat[4]{ 0.1,0.1,0.1,1 });
+	mainLight.setConstantAttenuation(0);
+	mainLight.setLinearAttenuation(0);
+	mainLight.setQuadraticAttenuation(0);
+	mainLight.setUpLightBulb(&ceilingTexture, SH_CUBE, new GLfloat[4]{1,1,1,1}, false, true);
+	mainLight.setThisLight(GL_LIGHT0);
+	//mainLight.applyLightParameters(false);
+
+	mainLight.setLightAmbient(new GLfloat[4]{ 0,0,0,1 });
+	flashLight.setLightPosition(new GLfloat[4]{ 0,0,-14,1.f });
+	flashLight.setLightDiffuse(new GLfloat[4]{ 1,1,1,1.f });
+	flashLight.setLightSpot(new GLfloat[3]{ 0.f,0.f,-1.f});
+	flashLight.setConstantAttenuation(0.3);
+	flashLight.setLinearAttenuation(0.1);
+	flashLight.setQuadraticAttenuation(0);
+	flashLight.setUpLightBulb(&ceilingTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
+	flashLight.setThisLight(GL_LIGHT1);
+	flashLight.applyLightParameters(true);
+
+	/*
+	mainLight.setLightPosition(new GLfloat[4]{ 0,0,0,1 });
+	mainLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
+	mainLight.setLightDiffuse(new GLfloat[4]{ 0.1,0.1,0.1,1 });
+	mainLight.setConstantAttenuation(0.1);
+	mainLight.setLinearAttenuation(0.1);
+	mainLight.setQuadraticAttenuation(0.1);
+	mainLight.setUpLightBulb(&ceilingTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
+	mainLight.setThisLight(GL_LIGHT0);
+	mainLight.applyLightParameters(false);
 
 	mainLight.setLightPosition(new GLfloat[4]{ 0,0,0,1 });
 	mainLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
@@ -139,13 +203,13 @@ Scene::Scene(Input *in)
 	mainLight.setConstantAttenuation(0.1);
 	mainLight.setLinearAttenuation(0.1);
 	mainLight.setQuadraticAttenuation(0.1);
-
-	mainLight.setUpLightBulb(&ceilingTexture, SH_CUBE, new GLfloat[4]{1,1,1,1}, false, true);
-
+	mainLight.setUpLightBulb(&ceilingTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
 	mainLight.setThisLight(GL_LIGHT0);
 	mainLight.applyLightParameters(false);
+	*/
 
-	currentLight = &mainLight;
+	currentLight = &flashLight;
+	
 }
 
 void Scene::renderShadows() {
@@ -165,7 +229,7 @@ void Scene::renderShadows() {
 	//render the mirrors shadow too
 	glPushMatrix();
 	glTranslatef(mirrorPosition.x, mirrorPosition.y, mirrorPosition.z);
-	glScalef(7, 7, 7);
+	glScalef(10, 7, 14);
 	glRotatef(-90, 0, 1, 0);
 	mirror.render();
 	glPopMatrix();
@@ -181,23 +245,111 @@ void Scene::renderShadows() {
 	shadowCheck = 0;
 }
 
-void Scene::renderScene() {
+void Scene::renderTableObjects() {
+	glPushMatrix();
+
+	//render table
+	glPushMatrix();
+	glScalef(15, 10, 15);
+	table.render();
+	glPopMatrix();
+
 
 	glPushMatrix();
-	glTranslatef(2.5, 0, 0);
+	// move to the top of the table
+	//render the changing shape
+	glTranslatef(0, 5.5, 0);
+	glPushMatrix();
+	glTranslatef(3,0,-1);
+	if (swapShapeTimer > 0.25f) {
+		swapShapeTimer = 0;
+		newShape++;
+	}
+	if (newShape > 6 || newShape < 3) {
+			newShape = 3;
+	}
+	
+	shapeChanger.loadShape(newShape);
+	shapeChanger.render();
+	glPopMatrix();
+
+	// render teapot on top of the table
+	glPushMatrix();
 	glScalef(0.1, 0.1, 0.1);
-	glRotatef(tempRotate,0,1,0);
+	glRotatef(tempRotate, 0, 1, 0);
 	teapot.render();
 	glPopMatrix();
 
+	glPopMatrix();
+
+	//render spinning sword
+	glPushMatrix();
+	glRotatef(swordOrbit, 0, 1, 0);
+	glTranslatef(10, 3, 0);
+	glScalef(0.1, 0.1, 0.1);
+	glRotatef(swordRotation, 0, 1, 0);
+	sword.render();
+	glPopMatrix();
+
+	glPopMatrix();
+}
+
+void Scene::renderScene() {
+	//rendingwall and flashLightModel and light together
+	glPushMatrix();
+	glTranslatef(0,0,-12);
+
+	//render the flashLightModel
+	glPushMatrix();
+	glRotatef(-90, 1, 0, 0);
+	glScalef(0.1,0.1,0.1);
+	flashLightModel.render();
+	glPopMatrix();
+
+	//render the wall
+	glPushMatrix();
+	glTranslatef(0,0,-5);
+	glRotatef(90,1,0,0);
+	glScalef(0.3,0.3,0.3);
+	wall.render();
+	glPopMatrix();
+	//render the light if shadows arent being rendered
+	if (shadowCheck == 0) {
+
+
+	}
+
+	glPopMatrix();
+
+	glPushMatrix();
+	//glScalef(10, 10, 10);
+	flashLight.render();
+	glPopMatrix();
+
+	// cube is rendered seperately from the rest of the scene
 	glPushMatrix();
 	glTranslatef(0, 2, 0);
 	square.render();
 	glPopMatrix();
 
+	// table and the objects on it are rendered using hierarchical modelling and a miniature version is rendered on the tabletop
+	glPushMatrix();
+	glTranslatef(-10, -3, 0);
+	renderTableObjects();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-13, 2, 0);
+	glScalef(0.1,0.1,0.1);
+	renderTableObjects();
+	glPopMatrix();
+
+	// these objects will not be drawn if shadows are being created
 	if (shadowCheck == 0) {
+		//rendering the lights
 		mainLight.render();
 
+		//rendering the floor and ceiling
 		glPushMatrix();
 		glTranslatef(0, -3, 0);
 		glScalef(5, 5, 5);
@@ -205,7 +357,7 @@ void Scene::renderScene() {
 		glPopMatrix();
 
 		glPushMatrix();
-		glTranslatef(0, 5, 0);
+		glTranslatef(0, 14, 0);
 		glScalef(5, 5, 5);
 		ceiling.render();
 		glPopMatrix();
@@ -226,7 +378,7 @@ void Scene::drawMirrorWorld() {
 	//draw the stencil
 	glPushMatrix();
 	glTranslatef(mirrorPosition.x, mirrorPosition.y, mirrorPosition.z);
-	glScalef(7, 7, 7);
+	glScalef(10, 7, 14);
 	glRotatef(-90, 0, 1, 0);
 	mirror.render();
 	glPopMatrix();
@@ -238,7 +390,6 @@ void Scene::drawMirrorWorld() {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
 
-
 	//translate double the distance of the mirror to the origin to have the scene drawn on the opposite side then draw the scene
 	glPushMatrix();
 	glTranslatef(mirrorPosition.x * 2.0, 0, 0);
@@ -247,12 +398,13 @@ void Scene::drawMirrorWorld() {
 	renderShadows();
 	glPopMatrix();
 
-
-
 	glDisable(GL_STENCIL_TEST);
 }
 
 void Scene::userInputCamera(float dt) {
+	if (dt > 1) {
+		dt = 0;
+	}
 	//rotation pitch(x) yaw(y) roll(z)
 	if (input->getMouseX() > (width / 2.0) || input->getMouseX() < (width / 2.0)) {
 		cameraCurrent->setYaw(cameraCurrent->getYaw() + ((input->getMouseX() - (width / 2.0)) * dt * cameraCurrent->getRotSpeed().x));
@@ -297,38 +449,37 @@ void Scene::userInputCamera(float dt) {
 		cameraCurrent->update();
 	}
 
-	if (input->isKeyDown('`')) {
-		cameraCurrent = &secondCamera;
-	}
-	if (input->isKeyDown('o')) {
-		cameraCurrent = &cameraPlayer1P;
-	}
 }
 void Scene::userInputLight(float dt) {
+	if (dt > 1) {
+		dt = 0;
+	}
 	if (input->isKeyDown('w')) {
-		mainLight.getLightPosition()[1] += 1 * dt;
+		currentLight->getLightPosition()[1] += 3 * dt;
 	}
 	if (input->isKeyDown('s')) {
-		mainLight.getLightPosition()[1] -= 1 * dt;
+		currentLight->getLightPosition()[1] -= 3 * dt;
 	}
 	if (input->isKeyDown('d')) {
-		mainLight.getLightPosition()[0] += 1 * dt;
+		currentLight->getLightPosition()[0] += 3 * dt;
 	}
 	if (input->isKeyDown('a')) {
-		mainLight.getLightPosition()[0] -= 1 * dt;
+		currentLight->getLightPosition()[0] -= 3 * dt;
 	}
 	if (input->isKeyDown('q')) {
-		mainLight.getLightPosition()[2] += 1 * dt;
+		currentLight->getLightPosition()[2] += 3 * dt;
 	}
 	if (input->isKeyDown('e')) {
-		mainLight.getLightPosition()[2] -= 1 * dt;
+		currentLight->getLightPosition()[2] -= 3 * dt;
 	}
 
 }
 
 void Scene::handleInput(float dt)
 {
-
+	if (dt > 1) {
+		dt = 0;
+	}
 	switch (userInputSelect)
 	{
 		case 1:
@@ -343,12 +494,48 @@ void Scene::handleInput(float dt)
 
 	// Handle user input
 
-
-	if (input->isKeyDown('1')) {
-		userInputSelect = 1;
+	if (input->isKeyDown('c')) {
+		if (input->isKeyDown('1')) {
+			cameraCurrent = &cameraPlayer1P;
+		}
+		else if (input->isKeyDown('2')) {
+			cameraCurrent = &cameraPlayer3P;
+		}
+		else if (input->isKeyDown('3')) {
+			cameraCurrent = &swordCamera;
+		}
 	}
-	else if (input->isKeyDown('2')) {
-		userInputSelect = 2;
+	else if (input->isKeyDown('l')) {	
+		if (input->isKeyDown('1')) {
+			currentLight = &mainLight;
+		}
+		else if (input->isKeyDown('2')) {
+			currentLight = &colouredLight;
+		}
+		else if (input->isKeyDown('3')) {
+			currentLight = &flashingLight;
+		}		
+	}
+	else {
+		if (input->isKeyDown('1')) {
+			userInputSelect = 1;
+		}
+		else if (input->isKeyDown('2')) {
+			userInputSelect = 2;
+		}
+		else if (input->isKeyDown('3')) {
+			userInputSelect = 3;
+		}
+	}
+
+	if (input->isKeyDown('-')) {
+		glPolygonMode(GL_FRONT, GL_LINE);
+		glPolygonMode(GL_BACK, GL_LINE);
+
+	}
+	else if (input->isKeyDown('=')) {
+		glPolygonMode(GL_FRONT, GL_FILL);
+		glPolygonMode(GL_BACK, GL_FILL);
 	}
 
 	glutWarpPointer(width / 2.0, height / 2.0);
@@ -356,9 +543,39 @@ void Scene::handleInput(float dt)
 
 void Scene::update(float dt)
 {
+	if (dt > 1) {
+		dt = 0;
+	}
+	swapShapeTimer += dt;
 	// update scene related variables.
 	// Calculate FPS for output
 	tempRotate += 90 * dt;
+	swordRotation += 270 * dt;
+	swordOrbit += -90 * dt;
+	if (swordRotation >= 360) {
+		swordRotation = 0;
+	}
+	if (swordOrbit >= 360) {
+		swordOrbit = 0;
+	}
+	swordCamera.setYaw(swordOrbit);
+	if (cameraCurrent == &swordCamera) {
+		
+		swordCamera.update();
+		swordCamera.setLookAt(Vector3(-10, 4,0));
+		if (!swordCameraFixed) {
+			swordCameraFixed = true;
+		}
+	}
+	if (swordCameraFixed) {
+		swordCamera.setPosition(swordCamera.getPosition() + Vector3(
+			swordCamera.getForward().x * (90.f / 360.f) * (2 * 3.14159 * 10) * dt,
+			swordCamera.getForward().y * (90.f / 360.f) * (2 * 3.14159 * 10) * dt,
+			swordCamera.getForward().z * (90.f / 360.f) * (2 * 3.14159 * 10) * dt
+		));
+	}
+	
+	
 	calculateFPS();
 }
 
@@ -405,12 +622,12 @@ void Scene::render() {
 	//draw physical mirror
 	glPushMatrix();
 	glTranslatef(mirrorPosition.x, mirrorPosition.y, mirrorPosition.z);
-	glScalef(7, 7, 7);
+	glScalef(10, 7, 14);
 	glRotatef(-90, 0, 1, 0);
 	mirror.render();
 	glPopMatrix();
 
-	renderShadows();
+	//renderShadows();
 	//
 	//
 	//

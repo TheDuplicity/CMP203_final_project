@@ -1,5 +1,8 @@
 #pragma once
 #include "Vector3.h"
+#include "glut.h"
+#include <gl/GL.h>
+#include <gl/GLU.h>
 class Camera
 {
 private:
@@ -14,6 +17,8 @@ private:
 	float Roll; // z rot
 	Vector3 rotSpeed;
 	Vector3 rotationLimits;
+
+	float positionArray[4][4];
 
 public:
 	Camera();
@@ -38,6 +43,7 @@ public:
 	Vector3 getLookAt() { return lookAt; };
 	void setRight(Vector3 cameraRight) { right = cameraRight; };
 	Vector3 getRight() { return right; };
+
 
 	void update();
 };

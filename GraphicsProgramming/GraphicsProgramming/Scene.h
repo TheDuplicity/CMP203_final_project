@@ -52,6 +52,7 @@ protected:
 	void renderShadows();
 	void userInputCamera(float dt);
 	void userInputLight(float dt);
+	void renderTableObjects();
 
 	//shadows
 	Shadow shadow;
@@ -63,6 +64,10 @@ protected:
 	Shape light;
 	Shape mirror;
 	Shape ceiling;
+	Shape shapeChanger;
+	int newShape;
+	float swapShapeTimer;
+	Shape wall;
 
 	// textures
 
@@ -72,11 +77,16 @@ protected:
 	GLuint floorTexture;
 	GLuint ceilingTexture;
 	GLuint mirrorTexture;
+	GLuint wallTexture;
 	
 	// Lights
 
 	Light mainLight;
+	Light colouredLight;
+	Light flashingLight;
+	Light flashLight;
 	Light* currentLight;
+
 
 	GLfloat lightDiffuse[4]{ 0.7f,0.4f,0.4f,1.f };
 	GLfloat lightAmbient[4]{ 0.f,0.f,0.f,0.f };
@@ -86,12 +96,16 @@ protected:
 	// models
 
 	Model teapot;
+	Model table;
+	Model sword;
+	Model flashLightModel;
 
 	// camera
-
+	
 	Camera* cameraCurrent;
 	Camera cameraPlayer1P;
-	Camera secondCamera;
+	Camera cameraPlayer3P;
+	Camera swordCamera;
 	GLfloat cameraSpeed;
 
 	// materials
@@ -108,6 +122,9 @@ protected:
 	Vector3 mirrorPosition = (5.0,0.0,0.0);
 	int shadowCheck;
 	int userInputSelect;
+	GLfloat swordRotation;
+	GLfloat swordOrbit;
+	bool swordCameraFixed;
 
 	GLfloat floorCorners[12] = {
 		-25, -3, 25,

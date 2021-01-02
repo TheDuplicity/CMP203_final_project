@@ -5,7 +5,10 @@ Camera::Camera() {
 	Yaw = 0, Pitch = 0, Roll = 0;
 	rotSpeed.x = 5, rotSpeed.y = 3, rotSpeed.z = 10;
 	rotationLimits.x = 90, rotationLimits.y = 361, rotationLimits.z = 45;
+
+
 }
+
 
 void Camera::update() {
 	if (Pitch > rotationLimits.x) {

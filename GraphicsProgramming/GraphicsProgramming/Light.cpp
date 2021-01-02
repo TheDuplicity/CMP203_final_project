@@ -1,6 +1,12 @@
 #include "Light.h"
 Light::Light() {
 	thisLight = GL_LIGHT0;
+	for (int i = 0; i < 4; i++) {
+		lightAmbient[i] = 1.f;
+		lightDiffuse[i] = 1.f;
+		lightPosition[i] = 0.f;
+		lightSpot[i] = 0.f;
+	}
 
 }
 void Light::setUpLightBulb(GLuint* texture, int shape, GLfloat colour[], bool isTransparent, bool isTextured) {
@@ -25,13 +31,16 @@ void Light::applyLightParameters(bool spotLight) {
 	glLightf(thisLight, GL_LINEAR_ATTENUATION, linearAttenuation);
 	glLightf(thisLight, GL_QUADRATIC_ATTENUATION, quadraticAttenuation);
 
+	glLightfv(thisLight, GL_AMBIENT, lightAmbient);
+	glLightfv(thisLight, GL_DIFFUSE, lightDiffuse);
+	glLightfv(thisLight, GL_POSITION, lightPosition);
 	if (spotLight) {
 		glLightf(thisLight, GL_SPOT_CUTOFF, 25.0f);
 		glLightfv(thisLight, GL_SPOT_DIRECTION, lightSpot);
 		glLightf(thisLight, GL_SPOT_EXPONENT, 50.0);
 	}
-	glLightfv(thisLight, GL_AMBIENT, lightAmbient);
-	glLightfv(thisLight, GL_DIFFUSE, lightDiffuse);
-	glLightfv(thisLight, GL_POSITION, lightPosition);
+
 	glEnable(thisLight);
+
+
 }
