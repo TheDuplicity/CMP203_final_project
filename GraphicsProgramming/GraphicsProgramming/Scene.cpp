@@ -186,6 +186,44 @@ Scene::Scene(Input *in)
 	flashLight.setThisLight(GL_LIGHT1);
 	flashLight.applyLightParameters(true);
 
+	//
+	//
+	//
+	//
+	//
+	//TO DO
+	/*
+	user created geometry
+		lightingand texturing
+		transparencyand depth sorting
+		procedurally generated shapes / primitives which are correctly lit and textured
+		use of vertex arrays
+		multiple lights of different colours and some animated
+		some user controllable lights
+		working camera using mouseand keyboard controls
+		multiple cameras with different comtrol schemes like procedurally cxontrolled vies, 3rd person, limited controls, tracking
+		control ovjects in the scene other than the camera
+		hierarchichal modeling like the solar system example
+		use of shadowsand the stencil buffer
+		a wireframe mode
+		well commentedand use of classes
+	* 
+	* 
+	* 
+	* 
+	get a flashlight obj modeland have it shine a light at a wall
+		make a light that changes coloursand moves around the player like a fairyand give it a sphere object
+		make another light that changes brightness(let the player move this)
+		make a couple spheres cuz why not
+		*/
+	//
+		//
+		//
+		//
+		//
+		//
+		//
+
 	/*
 	mainLight.setLightPosition(new GLfloat[4]{ 0,0,0,1 });
 	mainLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
