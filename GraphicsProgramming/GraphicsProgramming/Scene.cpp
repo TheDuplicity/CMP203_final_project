@@ -165,7 +165,7 @@ Scene::Scene(Input *in)
 	wall.setIsTextured(true);
 
 	//lights
-	mainLight.setLightPosition(new GLfloat[4]{ -25,5,-8,1 });
+	mainLight.setLightPosition(new GLfloat[4]{ 0,8,-10,1 });
 	mainLight.setLightAmbient(new GLfloat[4]{ 1.,1.,1.,1 });
 	mainLight.setLightDiffuse(new GLfloat[4]{ 1.,1.,1.,1 });
 	mainLight.setConstantAttenuation(0.1);
@@ -173,7 +173,7 @@ Scene::Scene(Input *in)
 	mainLight.setQuadraticAttenuation(0.02);
 	mainLight.setUpLightBulb(&mirrorTexture, SH_CUBE, new GLfloat[4]{1,1,1,1}, false, true);
 	mainLight.setThisLight(GL_LIGHT0);
-	mainLight.applyLightParameters(false);
+
 
 	mainLight.setLightAmbient(new GLfloat[4]{ 0,0,0,1 });
 	flashLight.setLightPosition(new GLfloat[4]{ -0.1,0,-13.6,1.f });
@@ -181,10 +181,11 @@ Scene::Scene(Input *in)
 	flashLight.setLightSpot(new GLfloat[3]{ 0.f,0.f,-1.f});
 	flashLight.setConstantAttenuation(0.1);
 	flashLight.setLinearAttenuation(0.05);
-	flashLight.setQuadraticAttenuation(0.05);
+	flashLight.setQuadraticAttenuation(0.01);
 	flashLight.setUpLightBulb(&mirrorTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
 	flashLight.setThisLight(GL_LIGHT1);
-	flashLight.applyLightParameters(true);
+	flashLight.setIsSpotLight(true);
+
 
 	//
 	//
@@ -223,30 +224,18 @@ Scene::Scene(Input *in)
 		//
 		//
 		//
-
-	/*
-	flashingLight.setLightPosition(new GLfloat[4]{ 0,0,0,1 });
-	flashingLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
-	flashingLight.setLightDiffuse(new GLfloat[4]{ 0.1,0.1,0.1,1 });
-	flashingLight.setConstantAttenuation(0.1);
-	flashingLight.setLinearAttenuation(0.1);
-	flashingLight.setQuadraticAttenuation(0.1);
+	
+	flashingLight.setLightPosition(new GLfloat[4]{ -40,5,-10,1 });
+	flashingLight.setLightAmbient(new GLfloat[4]{ 1.,1.,1.,1 });
+	flashingLight.setLightDiffuse(new GLfloat[4]{ 1.,1.,1.,1 });
+	flashingLight.setConstantAttenuation(0.0);
+	flashingLight.setLinearAttenuation(0.0);
+	flashingLight.setQuadraticAttenuation(0.0);
 	flashingLight.setUpLightBulb(&mirrorTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
 	flashingLight.setThisLight(GL_LIGHT2);
-	flashingLight.applyLightParameters(false);
-	*/
-	/*
-	flashingLight.setLightPosition(new GLfloat[4]{ 10, 10,-12 });
-	flashingLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
-	flashingLight.setLightDiffuse(new GLfloat[4]{ 0.1,0.1,0.1,1 });
-	flashingLight.setConstantAttenuation(0.2);
-	flashingLight.setLinearAttenuation(0.1);
-	flashingLight.setQuadraticAttenuation(0.06);
-	flashingLight.setUpLightBulb(&mirrorTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
-	flashingLight.setThisLight(GL_LIGHT3);
-	flashingLight.applyLightParameters(false);
-	*/
-	colouredLight.setLightPosition(new GLfloat[4]{ 10, 10,-12, 1 });
+
+	
+	colouredLight.setLightPosition(new GLfloat[4]{ 40, 10,-12, 1 });
 	colouredLight.setLightAmbient(new GLfloat[4]{ 0,0.,0.,1 });
 	colouredLight.setLightDiffuse(new GLfloat[4]{ 1.,1.,1.,1 });
 	colouredLight.setConstantAttenuation(0.1);
@@ -254,10 +243,10 @@ Scene::Scene(Input *in)
 	colouredLight.setQuadraticAttenuation(0.02);
 	colouredLight.setUpLightBulb(&mirrorTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
 	colouredLight.setThisLight(GL_LIGHT3);
-	colouredLight.applyLightParameters(false);
+
 	
 
-	currentLight = &flashLight;
+	currentLight = &mainLight;
 
 	
 }
@@ -356,6 +345,8 @@ void Scene::renderScene() {
 		mainLight.render();
 
 		colouredLight.render();
+
+		flashingLight.render();
 
 		//rendering the floor and ceiling
 		glPushMatrix();
@@ -636,6 +627,11 @@ void Scene::update(float dt)
 		colourChangeTimer = 0;
 		colouredLight.modifyLightDiffuse((float)(rand() % 100) * 0.1, (float)(rand() % 100) * 0.1, (float)(rand() % 100) * 0.1);
 	}
+	flashingLight.setQuadraticAttenuation(flashingLight.getQuadraticAttenuation() + ((float)0.045 * dt));
+	if (flashingLight.getQuadraticAttenuation() > 0.1) {
+		flashingLight.setQuadraticAttenuation(0.03);
+	}
+
 	calculateFPS();
 }
 

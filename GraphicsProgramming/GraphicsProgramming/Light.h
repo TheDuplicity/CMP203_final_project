@@ -42,11 +42,17 @@ public:
 		}
 	};
 
+	GLfloat getQuadraticAttenuation() { return quadraticAttenuation; };
+	GLfloat getLinearAttenuation() { return linearAttenuation; };
+	GLfloat getConstantAttenuation() { return constantAttenuation; };
+
 	void setConstantAttenuation(GLfloat inputConstantAttenuation) { constantAttenuation = inputConstantAttenuation; };
 	void setLinearAttenuation(GLfloat inputLinearAttenuation) { linearAttenuation = inputLinearAttenuation; };
 	void setQuadraticAttenuation(GLfloat inputQuadraticAttenuation) { quadraticAttenuation = inputQuadraticAttenuation; };
 
-	void applyLightParameters(bool spotLight);
+	void setIsSpotLight(GLboolean spotLight) { isSpotLight = spotLight; };
+
+	void applyLightParameters();
 
 	void setUpLightBulb(GLuint *texture, int shape, GLfloat colour[], bool isTransparent, bool isTextured);
 
@@ -63,6 +69,7 @@ private:
 	GLfloat linearAttenuation;
 	GLfloat quadraticAttenuation;
 	GLuint thisLight;
+	GLboolean isSpotLight;
 	Shape lightBulb;
 };
 
