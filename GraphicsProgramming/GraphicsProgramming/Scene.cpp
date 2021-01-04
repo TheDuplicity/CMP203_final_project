@@ -165,24 +165,24 @@ Scene::Scene(Input *in)
 	wall.setIsTextured(true);
 
 	//lights
-	mainLight.setLightPosition(new GLfloat[4]{ 0,0,0,1 });
-	mainLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
-	mainLight.setLightDiffuse(new GLfloat[4]{ 0.1,0.1,0.1,1 });
-	mainLight.setConstantAttenuation(0);
-	mainLight.setLinearAttenuation(0);
-	mainLight.setQuadraticAttenuation(0);
-	mainLight.setUpLightBulb(&ceilingTexture, SH_CUBE, new GLfloat[4]{1,1,1,1}, false, true);
+	mainLight.setLightPosition(new GLfloat[4]{ -25,5,-8,1 });
+	mainLight.setLightAmbient(new GLfloat[4]{ 1.,1.,1.,1 });
+	mainLight.setLightDiffuse(new GLfloat[4]{ 1.,1.,1.,1 });
+	mainLight.setConstantAttenuation(0.1);
+	mainLight.setLinearAttenuation(0.05);
+	mainLight.setQuadraticAttenuation(0.02);
+	mainLight.setUpLightBulb(&mirrorTexture, SH_CUBE, new GLfloat[4]{1,1,1,1}, false, true);
 	mainLight.setThisLight(GL_LIGHT0);
-	//mainLight.applyLightParameters(false);
+	mainLight.applyLightParameters(false);
 
 	mainLight.setLightAmbient(new GLfloat[4]{ 0,0,0,1 });
-	flashLight.setLightPosition(new GLfloat[4]{ 0,0,-14,1.f });
-	flashLight.setLightDiffuse(new GLfloat[4]{ 1,1,1,1.f });
+	flashLight.setLightPosition(new GLfloat[4]{ -0.1,0,-13.6,1.f });
+	flashLight.setLightDiffuse(new GLfloat[4]{ 10,10,10,1.f });
 	flashLight.setLightSpot(new GLfloat[3]{ 0.f,0.f,-1.f});
-	flashLight.setConstantAttenuation(0.3);
-	flashLight.setLinearAttenuation(0.1);
-	flashLight.setQuadraticAttenuation(0);
-	flashLight.setUpLightBulb(&ceilingTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
+	flashLight.setConstantAttenuation(0.1);
+	flashLight.setLinearAttenuation(0.05);
+	flashLight.setQuadraticAttenuation(0.05);
+	flashLight.setUpLightBulb(&mirrorTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
 	flashLight.setThisLight(GL_LIGHT1);
 	flashLight.applyLightParameters(true);
 
@@ -225,28 +225,40 @@ Scene::Scene(Input *in)
 		//
 
 	/*
-	mainLight.setLightPosition(new GLfloat[4]{ 0,0,0,1 });
-	mainLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
-	mainLight.setLightDiffuse(new GLfloat[4]{ 0.1,0.1,0.1,1 });
-	mainLight.setConstantAttenuation(0.1);
-	mainLight.setLinearAttenuation(0.1);
-	mainLight.setQuadraticAttenuation(0.1);
-	mainLight.setUpLightBulb(&ceilingTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
-	mainLight.setThisLight(GL_LIGHT0);
-	mainLight.applyLightParameters(false);
-
-	mainLight.setLightPosition(new GLfloat[4]{ 0,0,0,1 });
-	mainLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
-	mainLight.setLightDiffuse(new GLfloat[4]{ 0.1,0.1,0.1,1 });
-	mainLight.setConstantAttenuation(0.1);
-	mainLight.setLinearAttenuation(0.1);
-	mainLight.setQuadraticAttenuation(0.1);
-	mainLight.setUpLightBulb(&ceilingTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
-	mainLight.setThisLight(GL_LIGHT0);
-	mainLight.applyLightParameters(false);
+	flashingLight.setLightPosition(new GLfloat[4]{ 0,0,0,1 });
+	flashingLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
+	flashingLight.setLightDiffuse(new GLfloat[4]{ 0.1,0.1,0.1,1 });
+	flashingLight.setConstantAttenuation(0.1);
+	flashingLight.setLinearAttenuation(0.1);
+	flashingLight.setQuadraticAttenuation(0.1);
+	flashingLight.setUpLightBulb(&mirrorTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
+	flashingLight.setThisLight(GL_LIGHT2);
+	flashingLight.applyLightParameters(false);
 	*/
+	/*
+	flashingLight.setLightPosition(new GLfloat[4]{ 10, 10,-12 });
+	flashingLight.setLightAmbient(new GLfloat[4]{ 1,1,1,1 });
+	flashingLight.setLightDiffuse(new GLfloat[4]{ 0.1,0.1,0.1,1 });
+	flashingLight.setConstantAttenuation(0.2);
+	flashingLight.setLinearAttenuation(0.1);
+	flashingLight.setQuadraticAttenuation(0.06);
+	flashingLight.setUpLightBulb(&mirrorTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
+	flashingLight.setThisLight(GL_LIGHT3);
+	flashingLight.applyLightParameters(false);
+	*/
+	colouredLight.setLightPosition(new GLfloat[4]{ 10, 10,-12, 1 });
+	colouredLight.setLightAmbient(new GLfloat[4]{ 0,0.,0.,1 });
+	colouredLight.setLightDiffuse(new GLfloat[4]{ 1.,1.,1.,1 });
+	colouredLight.setConstantAttenuation(0.1);
+	colouredLight.setLinearAttenuation(0.05);
+	colouredLight.setQuadraticAttenuation(0.02);
+	colouredLight.setUpLightBulb(&mirrorTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
+	colouredLight.setThisLight(GL_LIGHT3);
+	colouredLight.applyLightParameters(false);
+	
 
 	currentLight = &flashLight;
+
 	
 }
 
@@ -333,36 +345,51 @@ void Scene::renderTableObjects() {
 }
 
 void Scene::renderScene() {
-	//rendingwall and flashLightModel and light together
-	glPushMatrix();
-	glTranslatef(0,0,-12);
 
-	//render the flashLightModel
+	//flashlight light source plus lightbulb
 	glPushMatrix();
+	flashLight.render();
+	glPopMatrix();
+	// these objects will not be drawn if shadows are being created
+	if (shadowCheck == 0) {
+		//rendering the lights
+		mainLight.render();
+
+		colouredLight.render();
+
+		//rendering the floor and ceiling
+		glPushMatrix();
+		glTranslatef(0, -3, 0);
+		glScalef(3, 3, 3);
+		floor.render();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 14, 0);
+		glScalef(5, 5, 5);
+		ceiling.render();
+		glPopMatrix();
+	}
+
+	//render the flashlight
+	glPushMatrix();
+	glTranslatef(flashLight.getLightPosition()[0], flashLight.getLightPosition()[1], flashLight.getLightPosition()[2]);
+	glRotatef(-cameraPlayer1P.getYaw(), 0, 1, 0);
 	glRotatef(-90, 1, 0, 0);
-	glScalef(0.1,0.1,0.1);
+	glScalef(0.1, 0.1, 0.1);
 	flashLightModel.render();
 	glPopMatrix();
 
+
 	//render the wall
 	glPushMatrix();
-	glTranslatef(0,0,-5);
+	glTranslatef(0,0,-17);
 	glRotatef(90,1,0,0);
-	glScalef(0.3,0.3,0.3);
+	glScalef(0.6,0.6,0.6);
+	glScalef(2, 2, 2);
 	wall.render();
 	glPopMatrix();
-	//render the light if shadows arent being rendered
-	if (shadowCheck == 0) {
 
-
-	}
-
-	glPopMatrix();
-
-	glPushMatrix();
-	//glScalef(10, 10, 10);
-	flashLight.render();
-	glPopMatrix();
 
 	// cube is rendered seperately from the rest of the scene
 	glPushMatrix();
@@ -381,25 +408,6 @@ void Scene::renderScene() {
 	glScalef(0.1,0.1,0.1);
 	renderTableObjects();
 	glPopMatrix();
-
-	// these objects will not be drawn if shadows are being created
-	if (shadowCheck == 0) {
-		//rendering the lights
-		mainLight.render();
-
-		//rendering the floor and ceiling
-		glPushMatrix();
-		glTranslatef(0, -3, 0);
-		glScalef(5, 5, 5);
-		floor.render();
-		glPopMatrix();
-
-		glPushMatrix();
-		glTranslatef(0, 14, 0);
-		glScalef(5, 5, 5);
-		ceiling.render();
-		glPopMatrix();
-	}
 
 	
 
@@ -487,6 +495,12 @@ void Scene::userInputCamera(float dt) {
 		cameraCurrent->update();
 	}
 
+
+	flashLight.setLightPosition(new GLfloat[4]{ cameraPlayer1P.getPosition().x /*- ((float)1 * cameraPlayer1P.getForward().x)*/,
+		cameraPlayer1P.getPosition().y - 1/*+ ((float)3 * cameraPlayer1P.getForward().y)*/,
+		cameraPlayer1P.getPosition().z , 1.f });
+	flashLight.setLightSpot(new GLfloat[3]{ cameraPlayer1P.getForward().x,cameraPlayer1P.getForward().y,cameraPlayer1P.getForward().z });
+
 }
 void Scene::userInputLight(float dt) {
 	if (dt > 1) {
@@ -553,6 +567,10 @@ void Scene::handleInput(float dt)
 		else if (input->isKeyDown('3')) {
 			currentLight = &flashingLight;
 		}		
+		else if (input->isKeyDown('4')) {
+			currentLight = &flashLight;
+		}
+
 	}
 	else {
 		if (input->isKeyDown('1')) {
@@ -585,6 +603,7 @@ void Scene::update(float dt)
 		dt = 0;
 	}
 	swapShapeTimer += dt;
+	colourChangeTimer += dt;
 	// update scene related variables.
 	// Calculate FPS for output
 	tempRotate += 90 * dt;
@@ -612,8 +631,11 @@ void Scene::update(float dt)
 			swordCamera.getForward().z * (90.f / 360.f) * (2 * 3.14159 * 10) * dt
 		));
 	}
-	
-	
+	if (colourChangeTimer > 0.5) {
+		srand(time(NULL));
+		colourChangeTimer = 0;
+		colouredLight.modifyLightDiffuse((float)(rand() % 100) * 0.1, (float)(rand() % 100) * 0.1, (float)(rand() % 100) * 0.1);
+	}
 	calculateFPS();
 }
 
@@ -665,7 +687,7 @@ void Scene::render() {
 	mirror.render();
 	glPopMatrix();
 
-	//renderShadows();
+	renderShadows();
 	//
 	//
 	//
@@ -738,11 +760,11 @@ void Scene::resize(int w, int h)
 void Scene::calculateFPS()
 {
 	frame++;
-	time = glutGet(GLUT_ELAPSED_TIME);
+	timefps = glutGet(GLUT_ELAPSED_TIME);
 
-	if (time - timebase > 1000) {
-		sprintf_s(fps, "FPS: %4.2f", frame*1000.0 / (time - timebase));
-		timebase = time;
+	if (timefps - timebase > 1000) {
+		sprintf_s(fps, "FPS: %4.2f", frame*1000.0 / (timefps - timebase));
+		timebase = timefps;
 		frame = 0;
 	}
 }

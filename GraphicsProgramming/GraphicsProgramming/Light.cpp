@@ -2,10 +2,18 @@
 Light::Light() {
 	thisLight = GL_LIGHT0;
 	for (int i = 0; i < 4; i++) {
-		lightAmbient[i] = 1.f;
-		lightDiffuse[i] = 1.f;
+		lightAmbient[i] = 0.1f;
+		lightDiffuse[i] = 0.1f;
 		lightPosition[i] = 0.f;
-		lightSpot[i] = 0.f;
+		if (i == 3) {
+			lightPosition[i] = 1.f;
+			lightAmbient[i] = 1.f;
+			lightDiffuse[i] = 1.f;
+		}
+
+		if (i < 3) {
+			lightSpot[i] = 0.f;
+		}
 	}
 
 }
@@ -18,9 +26,10 @@ void Light::setUpLightBulb(GLuint* texture, int shape, GLfloat colour[], bool is
 }
 
 void Light::render() {
+	glLightfv(thisLight, GL_POSITION, lightPosition);
 	glPushMatrix();
 	glTranslatef(lightPosition[0], lightPosition[1], lightPosition[2]);
-	glScalef(0.1,0.1,0.1);
+	//glScalef(0.1,0.1,0.1);
 	lightBulb.render();
 	glPopMatrix();
 }
@@ -35,9 +44,9 @@ void Light::applyLightParameters(bool spotLight) {
 	glLightfv(thisLight, GL_DIFFUSE, lightDiffuse);
 	glLightfv(thisLight, GL_POSITION, lightPosition);
 	if (spotLight) {
-		glLightf(thisLight, GL_SPOT_CUTOFF, 25.0f);
+		glLightf(thisLight, GL_SPOT_CUTOFF, 20.0f);
 		glLightfv(thisLight, GL_SPOT_DIRECTION, lightSpot);
-		glLightf(thisLight, GL_SPOT_EXPONENT, 50.0);
+		glLightf(thisLight, GL_SPOT_EXPONENT, 60.0);
 	}
 
 	glEnable(thisLight);

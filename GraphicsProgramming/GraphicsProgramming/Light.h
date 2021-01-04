@@ -9,6 +9,13 @@ public:
 
 	void setThisLight(float newLight) { thisLight = newLight; };
 
+	void modifyLightDiffuse(float r, float g, float b) {
+		lightDiffuse[0] = r;
+		lightDiffuse[1] = g;
+		lightDiffuse[2] = b;
+		glLightfv(thisLight, GL_DIFFUSE, lightDiffuse);
+	}
+
 	void setLightDiffuse(GLfloat inpLightDiffuse[]) { 
 		for (int i = 0; i < 4; i++)
 		{ lightDiffuse[i] = inpLightDiffuse[i]; }

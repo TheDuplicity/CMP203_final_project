@@ -702,8 +702,8 @@ bool Shape::setSphere() {
 bool Shape::setPlane() {
 	renderType = SH_VERTEX;
 	Vector3 currentPosition = (0,0,0);
-	for (int z = -25; z < 25; z++) {
-		for (int x = -25; x < 25; x++) {
+	for (int z = -50; z < 50; z++) {
+		for (int x = -50; x < 50; x++) {
 
 			vertices.push_back(currentPosition.x + -0.5);
 			vertices.push_back(currentPosition.y + 0);

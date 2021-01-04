@@ -13,6 +13,7 @@
 #include "Input.h"
 #include <stdio.h>
 // Further includes should go here:
+#include "time.h"
 #include "SOIL.h"
 #include <vector>
 #include "Model.h"
@@ -118,6 +119,7 @@ protected:
 
 	// random
 
+	float colourChangeTimer;
 	float tempRotate;
 	Vector3 mirrorPosition = (5.0,0.0,0.0);
 	int shadowCheck;
@@ -149,7 +151,7 @@ protected:
 	float fov, nearPlane, farPlane;
 
 	// For FPS counter and mouse coordinate output.
-	int frame = 0, time, timebase = 0;
+	int frame = 0, timefps, timebase = 0;
 	char fps[40];
 	char mouseText[40];
 
