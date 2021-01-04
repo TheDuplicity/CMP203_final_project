@@ -1,9 +1,8 @@
 #include "Shape.h"
 Shape::Shape() {
+	//set default variables for the shape so it can run straight off the bat
+	loadShape(SH_CUBE);
 	renderType = SH_INDEX;
-	//drawPyramid();
-	//drawCube();
-	//drawSquare();
 	texture = NULL;
 	for (int i = 0; i < 4; i++)
 	{
@@ -14,18 +13,26 @@ Shape::Shape() {
 
 }
 Shape::Shape(GLuint* inpTexture) {
+	//set default variables for the shape so it can run straight off the bat
+	loadShape(SH_CUBE);
 	renderType = SH_INDEX;
-	//drawPyramid();
-	setCube();
-	//drawSquare();
+	texture = NULL;
+	for (int i = 0; i < 4; i++)
+	{
+		materialColour[i] = 1.f;
+	}
+	isTransparent = false;
+	isTextured = true;
 	texture = inpTexture;
 
 }
 void Shape::loadShape(int selectedShape) {
+	// clear all of the current info about the shape so the new shape can be placed into the arrays to be created properly
 	vertices.clear();
 	normals.clear();
 	textureCoords.clear();
 	indeces.clear();
+	//based on which shape is chosen, a different shape is created
 	switch (selectedShape)
 	{
 	case SH_SQUARE:
@@ -47,6 +54,7 @@ void Shape::loadShape(int selectedShape) {
 		break;
 	}
 }
+//this will allow the user tochange the scolour of the shape
 void Shape::loadColour(float r, float g, float b, float a) {
 	materialColour[0] = r;
 	materialColour[1] = g;
@@ -54,6 +62,7 @@ void Shape::loadColour(float r, float g, float b, float a) {
 	materialColour[3] = a;
 	
 }
+//create a cube but remap the texture coords to work for the skybox texture i have
 bool Shape::setSkyBox() {
 	setCube();
 	textureCoords.clear();
@@ -174,8 +183,11 @@ bool Shape::setSkyBox() {
 	return true;
 
 }
+//create all the data for each of the shapes
 bool Shape::setSquare() {
+	// render type tells us whether or not to use indices or just vertices to create the shape
 	renderType = SH_INDEX;
+	//store vertices so we have all the triangles to create the shape
 	vertices.push_back(-0.5);
 	vertices.push_back(-0.5);
 	vertices.push_back(0);
@@ -189,6 +201,7 @@ bool Shape::setSquare() {
 	vertices.push_back(0.5);
 	vertices.push_back(0);
 
+	//for shapes that need indeces like the square, set its indices
 	indeces.push_back(0);
 	indeces.push_back(1);
 	indeces.push_back(2);
@@ -196,6 +209,7 @@ bool Shape::setSquare() {
 	indeces.push_back(2);
 	indeces.push_back(3);
 
+	//map the relevant texture coords for each vertex or index
 	textureCoords.push_back(0);
 	textureCoords.push_back(1);
 	textureCoords.push_back(1);
@@ -204,6 +218,8 @@ bool Shape::setSquare() {
 	textureCoords.push_back(0);
 	textureCoords.push_back(1);
 	textureCoords.push_back(0);
+
+	//set the normals so lighting works properly
 
 	normals.push_back(0);
 	normals.push_back(0);
@@ -702,6 +718,7 @@ bool Shape::setSphere() {
 bool Shape::setPlane() {
 	renderType = SH_VERTEX;
 	Vector3 currentPosition = (0,0,0);
+	//create a plane of squares where the z and x values in the loops tell you how many squares are made for each axis (x100,z100)
 	for (int z = -50; z < 50; z++) {
 		for (int x = -50; x < 50; x++) {
 
@@ -845,9 +862,11 @@ bool Shape::setPyramid() {
 }
 
 void Shape::render() {
+	// if its transparent, enable blend
 	if(isTransparent){
 		glEnable(GL_BLEND);
 	}
+	// if its textured, enable textures and load the texture for the shape
 	if (isTextured) {
 		glEnable(GL_TEXTURE_2D);
 
@@ -856,12 +875,14 @@ void Shape::render() {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 	else {
+		// disable textures if you dont have one
 		glDisable(GL_TEXTURE_2D);
 	}
 
-
+		// set the material colour so the shape has the right colour
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, materialColour);
 
+		//then set up the arrays with the shape data and format them to accept it in its current format
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -869,7 +890,7 @@ void Shape::render() {
 		glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
 		glNormalPointer(GL_FLOAT, 0, &normals[0]);
 		glTexCoordPointer(2, GL_FLOAT, 0, &textureCoords[0]);
-
+		//based on vertex or index shape, draw the shape using the data stored
 		if (renderType == SH_INDEX) {
 			glDrawElements(GL_TRIANGLES, indeces.size(), GL_UNSIGNED_INT, &indeces[0]);
 		}
@@ -880,7 +901,7 @@ void Shape::render() {
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	
+	// gidable blend or enable textures if you have them enabled/disabled to reset
 	if (isTransparent) {
 		glDisable(GL_BLEND);
 	}

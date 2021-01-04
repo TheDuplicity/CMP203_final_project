@@ -11,12 +11,14 @@ Camera::Camera() {
 
 
 void Camera::update() {
+	// set limits so the camera cant face anywhere you want, makes it more realistic
 	if (Pitch > rotationLimits.x) {
 		Pitch = rotationLimits.x;
 	}
 	else if (Pitch < - rotationLimits.x) {
 		Pitch = -90;
 	}
+	//the code to update the cameras forward up down etc based on its rotation
 	float cosR, cosP, cosY;
 	//temp values for sin/cos from 
 	float sinR, sinP, sinY;
@@ -48,6 +50,7 @@ void Camera::update() {
 	// this is a cross product between the forward and up vector.
 	// If you don’t need to calculate this,  don’t do it.
 
+	//set where its looking at and where the 'right' is based on its up and forward vectors
 	lookAt = Vector3(position.x + forward.x, position.y + forward.y, position.z + forward.z);
 
 	right = forward.cross(up);

@@ -27,6 +27,7 @@ bool Model::load(char* modelFilename, char* textureFilename)
 void Model::render()
 {
 
+	// enable textures and then draw the object based on the parsed data we have stored in a few vectors
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -39,7 +40,7 @@ void Model::render()
 	glNormalPointer(GL_FLOAT, 0, &normals[0]);
 	glTexCoordPointer(2, GL_FLOAT, 0, &texCoords[0]);
 
-
+	
 	glDrawArrays(GL_TRIANGLES, 0, vertex.size() / 3);
 
 
@@ -122,7 +123,10 @@ bool Model::loadModel(char* filename)
 	// TODO: By this point all model has been read from the file, but is not in the correct order.
 	// You NEED to loop over all the data and sort it into a render ready order/format.
 
+	// parse the data into the correct storage vectors to be used to load the shape at a later date
 	for (int i = 0; i < faces.size() - 3; i += 3) {
+		// we know the format of the incoming data so we can use that to find out which values in the array go to which new vector for storage
+
 		vertex.push_back(verts[faces[i] - 1].x);
 		vertex.push_back(verts[faces[i] - 1].y);
 		vertex.push_back(verts[faces[i] - 1].z);

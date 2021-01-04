@@ -6,6 +6,7 @@
 class Camera
 {
 private:
+	//store the info we need to know to correctly position and face the camera
 
 	Vector3 up;
 	Vector3 forward;
@@ -18,11 +19,11 @@ private:
 	Vector3 rotSpeed;
 	Vector3 rotationLimits;
 
-	float positionArray[4][4];
 
 public:
 	Camera();
 
+	//setters and getters for all of the variables stored in the camera so we can update it during the game
 	void setPitch(float inpPitch) { Pitch = inpPitch; };
 	float getPitch() { return Pitch; };
 	void setRoll(float inpRoll) { Roll = inpRoll; };

@@ -108,16 +108,27 @@ Scene::Scene(Input *in)
 	defaultTexture = &skyBoxTexture;
 	// Initialise scene variables
 
+	// make table spin
+	tableSpin = false;
+	tableSpinSpeed = 45;
+
 	glutSetCursor(GLUT_CURSOR_NONE);
+
+	//sort out other rotations for both the sword and the teapot
 	tempRotate = 0;
 	swordRotation = 0;
 	swordOrbit = 0;
 
+	// draw the mirror at these coords
 	mirrorPosition.x = 5.0;
 	mirrorPosition.y = 2.0;
+	//use to make sure shadows dont register the spheres around the lights
 	shadowCheck = 0;
+
+	//used to go into different input modes for light controls and camera controls
 	userInputSelect = 1;
 
+	//used to generate the scrolling shaoe between the 3 options provided in the shape class
 	newShape = 1;
 	swapShapeTimer = 0;
 
@@ -157,7 +168,7 @@ Scene::Scene(Input *in)
 	mirror.loadColour(0.3, 0.3, 0.85, 0.65);
 	mirror.setIsTransparent(true);
 	mirror.setIsTextured(true);
-	shapeChanger.loadColour(0.5, 0.5, 0.5, 1.f);
+	shapeChanger.loadColour(0.8, 0.5, 0.8, 1.f);
 	shapeChanger.loadShape(SH_SQUARE);
 	shapeChanger.setIsTextured(false);
 	wall.loadTexture(&wallTexture);
@@ -165,7 +176,7 @@ Scene::Scene(Input *in)
 	wall.setIsTextured(true);
 
 	//lights
-	mainLight.setLightPosition(new GLfloat[4]{ 0,8,-10,1 });
+	mainLight.setLightPosition(new GLfloat[4]{ -2,9,-5,1 });
 	mainLight.setLightAmbient(new GLfloat[4]{ 1.,1.,1.,1 });
 	mainLight.setLightDiffuse(new GLfloat[4]{ 1.,1.,1.,1 });
 	mainLight.setConstantAttenuation(0.1);
@@ -185,45 +196,6 @@ Scene::Scene(Input *in)
 	flashLight.setUpLightBulb(&mirrorTexture, SH_CUBE, new GLfloat[4]{ 1,1,1,1 }, false, true);
 	flashLight.setThisLight(GL_LIGHT1);
 	flashLight.setIsSpotLight(true);
-
-
-	//
-	//
-	//
-	//
-	//
-	//TO DO
-	/*
-	user created geometry
-		lightingand texturing
-		transparencyand depth sorting
-		procedurally generated shapes / primitives which are correctly lit and textured
-		use of vertex arrays
-		multiple lights of different colours and some animated
-		some user controllable lights
-		working camera using mouseand keyboard controls
-		multiple cameras with different comtrol schemes like procedurally cxontrolled vies, 3rd person, limited controls, tracking
-		control ovjects in the scene other than the camera
-		hierarchichal modeling like the solar system example
-		use of shadowsand the stencil buffer
-		a wireframe mode
-		well commentedand use of classes
-	* 
-	* 
-	* 
-	* 
-	get a flashlight obj modeland have it shine a light at a wall
-		make a light that changes coloursand moves around the player like a fairyand give it a sphere object
-		make another light that changes brightness(let the player move this)
-		make a couple spheres cuz why not
-		*/
-	//
-		//
-		//
-		//
-		//
-		//
-		//
 	
 	flashingLight.setLightPosition(new GLfloat[4]{ -40,5,-10,1 });
 	flashingLight.setLightAmbient(new GLfloat[4]{ 1.,1.,1.,1 });
@@ -245,22 +217,27 @@ Scene::Scene(Input *in)
 	colouredLight.setThisLight(GL_LIGHT3);
 
 	
-
+	//set the current light
 	currentLight = &mainLight;
 
 	
 }
 
 void Scene::renderShadows() {
+	//set shadowcheck so when drawing the shadows, the shperes around the lights and the floor and ceiling arent used
 	shadowCheck = 1;
+	// setup the shadows
 	glPushMatrix();
 	glEnable(GL_COLOR_MATERIAL);
 	//glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
+	// set the colour of the shadow to be based on the colour of the light
 	glColor4f(mainLight.getLightDiffuse()[0] / 5.0, mainLight.getLightDiffuse()[1] / 5.0, mainLight.getLightDiffuse()[2] / 5.0, .4f);
+	//move the shadows up slightly so they dont z fight with the floor. not using depth test so they arent drawn in front of the wrong things
 	glTranslatef(0,0.1,0);
+	// generate the shadow, only being done for the 1 light but doing the others would be copying this code and using the position of each light
 	shadow.generateShadowMatrix(shadowMatrix, mainLight.getLightPosition(), floorCorners);
 	glMultMatrixf((GLfloat*)shadowMatrix);
 	renderScene();
@@ -273,6 +250,7 @@ void Scene::renderShadows() {
 	mirror.render();
 	glPopMatrix();
 
+	//setup the lighting etc to be used in the normal render
 	glColor4f(1.0f, 1.0f, 1.0f,1.f);
 	//glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
@@ -281,6 +259,7 @@ void Scene::renderShadows() {
 	glDisable(GL_BLEND);
 
 	glPopMatrix();
+	// tell the program that it can draw planes and lights again
 	shadowCheck = 0;
 }
 
@@ -292,9 +271,8 @@ void Scene::renderTableObjects() {
 	glScalef(15, 10, 15);
 	table.render();
 	glPopMatrix();
-
-
 	glPushMatrix();
+
 	// move to the top of the table
 	//render the changing shape
 	glTranslatef(0, 5.5, 0);
@@ -318,7 +296,6 @@ void Scene::renderTableObjects() {
 	glRotatef(tempRotate, 0, 1, 0);
 	teapot.render();
 	glPopMatrix();
-
 	glPopMatrix();
 
 	//render spinning sword
@@ -362,7 +339,7 @@ void Scene::renderScene() {
 		glPopMatrix();
 	}
 
-	//render the flashlight
+	//render the flashlight around the flashlight light source and then rotate it to face the direction the camera is facing
 	glPushMatrix();
 	glTranslatef(flashLight.getLightPosition()[0], flashLight.getLightPosition()[1], flashLight.getLightPosition()[2]);
 	glRotatef(-cameraPlayer1P.getYaw(), 0, 1, 0);
@@ -388,18 +365,23 @@ void Scene::renderScene() {
 	square.render();
 	glPopMatrix();
 
+
 	// table and the objects on it are rendered using hierarchical modelling and a miniature version is rendered on the tabletop
 	glPushMatrix();
 	glTranslatef(-10, -3, 0);
+	if (tableSpin == true) {
+		glRotatef(tableSpinSpeed, 0, 1, 0);
+	}
+	glPushMatrix();
 	renderTableObjects();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(-13, 2, 0);
+	glTranslatef(-3, 5, 0);
 	glScalef(0.1,0.1,0.1);
 	renderTableObjects();
 	glPopMatrix();
-
+	glPopMatrix();
 	
 
 }
@@ -439,10 +421,11 @@ void Scene::drawMirrorWorld() {
 }
 
 void Scene::userInputCamera(float dt) {
+	//using this to ensure dt being too large doesnt result in large distance moving
 	if (dt > 1) {
 		dt = 0;
 	}
-	//rotation pitch(x) yaw(y) roll(z)
+	//rotation pitch(x) yaw(y) roll(z) based on mouse position
 	if (input->getMouseX() > (width / 2.0) || input->getMouseX() < (width / 2.0)) {
 		cameraCurrent->setYaw(cameraCurrent->getYaw() + ((input->getMouseX() - (width / 2.0)) * dt * cameraCurrent->getRotSpeed().x));
 		cameraCurrent->update();
@@ -456,6 +439,7 @@ void Scene::userInputCamera(float dt) {
 		cameraCurrent->setRoll(cameraCurrent->getRoll() + 90 * dt);
 		cameraCurrent->update();
 	}
+	//movements in camera direction but wasd is restriced to moving along z and x axis
 	//forward backwards
 	if (input->isKeyDown('w')) {
 		cameraCurrent->setPosition(cameraCurrent->getPosition() + Vector3(cameraSpeed * dt * cameraCurrent->getForward().x, 0/*cameraSpeed * dt * cameraCurrent->getForward().y*/, cameraSpeed * dt * cameraCurrent->getForward().z));
@@ -476,6 +460,7 @@ void Scene::userInputCamera(float dt) {
 		cameraCurrent->setPosition(cameraCurrent->getPosition() + Vector3(cameraSpeed * dt * cameraCurrent->getRight().x, 0/*cameraSpeed * dt * cameraCurrent->getRight().y*/, cameraSpeed * dt * cameraCurrent->getRight().z));
 		cameraCurrent->update();
 	}
+	//use spacebar and e to move up and down but you only move up and down along the y axis and you do not move in the other axis
 	//up down
 	if (input->isKeyDown(32)) {
 		cameraCurrent->setPosition(cameraCurrent->getPosition() + Vector3(0/*cameraSpeed * dt * cameraCurrent->getUp().x*/, cameraSpeed * dt * cameraCurrent->getUp().y, 0/* cameraSpeed * dt * cameraCurrent->getUp().z*/));
@@ -486,10 +471,11 @@ void Scene::userInputCamera(float dt) {
 		cameraCurrent->update();
 	}
 
-
+	// move the flashlight to be where the player camera is
 	flashLight.setLightPosition(new GLfloat[4]{ cameraPlayer1P.getPosition().x /*- ((float)1 * cameraPlayer1P.getForward().x)*/,
 		cameraPlayer1P.getPosition().y - 1/*+ ((float)3 * cameraPlayer1P.getForward().y)*/,
 		cameraPlayer1P.getPosition().z , 1.f });
+	// set the direction of the flashlight to be the direction the camera faces
 	flashLight.setLightSpot(new GLfloat[3]{ cameraPlayer1P.getForward().x,cameraPlayer1P.getForward().y,cameraPlayer1P.getForward().z });
 
 }
@@ -497,23 +483,24 @@ void Scene::userInputLight(float dt) {
 	if (dt > 1) {
 		dt = 0;
 	}
+	// move the light around
 	if (input->isKeyDown('w')) {
-		currentLight->getLightPosition()[1] += 3 * dt;
+		currentLight->getLightPosition()[1] += 6 * dt;
 	}
 	if (input->isKeyDown('s')) {
-		currentLight->getLightPosition()[1] -= 3 * dt;
+		currentLight->getLightPosition()[1] -= 6 * dt;
 	}
 	if (input->isKeyDown('d')) {
-		currentLight->getLightPosition()[0] += 3 * dt;
+		currentLight->getLightPosition()[0] += 6 * dt;
 	}
 	if (input->isKeyDown('a')) {
-		currentLight->getLightPosition()[0] -= 3 * dt;
+		currentLight->getLightPosition()[0] -= 6 * dt;
 	}
 	if (input->isKeyDown('q')) {
-		currentLight->getLightPosition()[2] += 3 * dt;
+		currentLight->getLightPosition()[2] += 6 * dt;
 	}
 	if (input->isKeyDown('e')) {
-		currentLight->getLightPosition()[2] -= 3 * dt;
+		currentLight->getLightPosition()[2] -= 6 * dt;
 	}
 
 }
@@ -523,6 +510,7 @@ void Scene::handleInput(float dt)
 	if (dt > 1) {
 		dt = 0;
 	}
+	// if the user presses '1' they go into camera control mode where they can move the camera and if they press '2' they can move the lights of their choice
 	switch (userInputSelect)
 	{
 		case 1:
@@ -536,7 +524,7 @@ void Scene::handleInput(float dt)
 	}
 
 	// Handle user input
-
+	// combining the 'c' press and the number keys let you select a camera
 	if (input->isKeyDown('c')) {
 		if (input->isKeyDown('1')) {
 			cameraCurrent = &cameraPlayer1P;
@@ -548,6 +536,7 @@ void Scene::handleInput(float dt)
 			cameraCurrent = &swordCamera;
 		}
 	}
+	// combing the 'l' key and pressing the number keys allows you to manipulated the different lights when you are in the light manipulation mode
 	else if (input->isKeyDown('l')) {	
 		if (input->isKeyDown('1')) {
 			currentLight = &mainLight;
@@ -563,6 +552,7 @@ void Scene::handleInput(float dt)
 		}
 
 	}
+	// if you arent controlling the light selection or camera selection, then the numbers 1 and 2 will let you go into camera control or light control mode
 	else {
 		if (input->isKeyDown('1')) {
 			userInputSelect = 1;
@@ -574,7 +564,7 @@ void Scene::handleInput(float dt)
 			userInputSelect = 3;
 		}
 	}
-
+	// using the minus key allows for wireframe mode and the equals keyy brings it back to fill mode
 	if (input->isKeyDown('-')) {
 		glPolygonMode(GL_FRONT, GL_LINE);
 		glPolygonMode(GL_BACK, GL_LINE);
@@ -584,7 +574,14 @@ void Scene::handleInput(float dt)
 		glPolygonMode(GL_FRONT, GL_FILL);
 		glPolygonMode(GL_BACK, GL_FILL);
 	}
-
+	// pressing 't' acttivaties the table and its contents to rotate and pressing 'y' stops and resets it back to its original position
+	if (input->isKeyDown('t')) {
+		tableSpin = true;
+	}
+	if(input->isKeyDown('y')){
+		tableSpin = false;
+	}
+	//place the cursor back into the middle for camera calculations
 	glutWarpPointer(width / 2.0, height / 2.0);
 }
 
@@ -593,10 +590,12 @@ void Scene::update(float dt)
 	if (dt > 1) {
 		dt = 0;
 	}
+	// setup timers
 	swapShapeTimer += dt;
 	colourChangeTimer += dt;
 	// update scene related variables.
-	// Calculate FPS for output
+
+	//setup rotations
 	tempRotate += 90 * dt;
 	swordRotation += 270 * dt;
 	swordOrbit += -90 * dt;
@@ -606,15 +605,18 @@ void Scene::update(float dt)
 	if (swordOrbit >= 360) {
 		swordOrbit = 0;
 	}
+	//rotate the sword camera which just goes in circles near the scene.
 	swordCamera.setYaw(swordOrbit);
 	if (cameraCurrent == &swordCamera) {
 		
 		swordCamera.update();
 		swordCamera.setLookAt(Vector3(-10, 4,0));
+		//done this so the camera doesnt spawn somewhere really far away and rotates in the middle of nowhere
 		if (!swordCameraFixed) {
 			swordCameraFixed = true;
 		}
 	}
+	//now we can move the camera in circles
 	if (swordCameraFixed) {
 		swordCamera.setPosition(swordCamera.getPosition() + Vector3(
 			swordCamera.getForward().x * (90.f / 360.f) * (2 * 3.14159 * 10) * dt,
@@ -622,16 +624,22 @@ void Scene::update(float dt)
 			swordCamera.getForward().z * (90.f / 360.f) * (2 * 3.14159 * 10) * dt
 		));
 	}
+	// use this every 0.5 seconds to chance the colour of the coloured light
 	if (colourChangeTimer > 0.5) {
 		srand(time(NULL));
 		colourChangeTimer = 0;
 		colouredLight.modifyLightDiffuse((float)(rand() % 100) * 0.1, (float)(rand() % 100) * 0.1, (float)(rand() % 100) * 0.1);
 	}
+	// change the brightness of the light by changing its quadratic attenuation and putting it back to 0.03 once it reaching its limit of 0.1
 	flashingLight.setQuadraticAttenuation(flashingLight.getQuadraticAttenuation() + ((float)0.045 * dt));
 	if (flashingLight.getQuadraticAttenuation() > 0.1) {
 		flashingLight.setQuadraticAttenuation(0.03);
 	}
-
+	//makethe table spin at 45 degrees a second
+	if (tableSpin) {
+		tableSpinSpeed += 45 * dt;
+	}
+	// Calculate FPS for output
 	calculateFPS();
 }
 
@@ -667,11 +675,11 @@ void Scene::render() {
 	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
 
-
+	// dont draw the mirror world if you are on the wrong side of the mirror where it shouldnt be visible anymore
 	if (cameraCurrent->getPosition().x < mirrorPosition.x) {
 		drawMirrorWorld();
 	}
-
+	//draw the scene
 	renderScene();
 
 
@@ -682,21 +690,8 @@ void Scene::render() {
 	glRotatef(-90, 0, 1, 0);
 	mirror.render();
 	glPopMatrix();
-
+	// draw the shadows
 	renderShadows();
-	//
-	//
-	//
-	//
-	// MAKE A COOL MISSILE LAUNCHER OR SMTHN
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
 	 
 	// End render geometry --------------------------------------
 

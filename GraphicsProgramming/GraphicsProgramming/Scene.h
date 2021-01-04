@@ -119,6 +119,8 @@ protected:
 
 	// random
 
+	bool tableSpin;
+	float tableSpinSpeed;
 	float colourChangeTimer;
 	float tempRotate;
 	Vector3 mirrorPosition = (5.0,0.0,0.0);

@@ -9,6 +9,8 @@
 
 using namespace std;
 
+
+//set up defines to make it easy to select the shape to be created
 #define SH_VERTEX  0x0001
 #define SH_INDEX  0x0002
 #define SH_CUBE  0x0003
@@ -22,6 +24,7 @@ class Shape
 {
 
 public:
+	// give the user the ability to change various aspects of the shape
 	Shape();
 	Shape(GLuint* inpTexture);
 	bool setSquare();
@@ -39,6 +42,7 @@ public:
 
 private:
 
+	//cariables to store what the shape is and where its textures etc are
 	GLuint* texture;
 	float materialColour[4];
 	bool isTransparent;
