@@ -119,6 +119,9 @@ protected:
 
 	// random
 
+	float colouredLightLimitsMax;
+	float colouredLightLimitsMin;
+	float colouredLightVelocity;
 	bool tableSpin;
 	float tableSpinSpeed;
 	float colourChangeTimer;

@@ -132,6 +132,7 @@ Scene::Scene(Input *in)
 	newShape = 1;
 	swapShapeTimer = 0;
 
+
 	//cameras
 
 	cameraCurrent = &cameraPlayer1P;
@@ -219,6 +220,12 @@ Scene::Scene(Input *in)
 	
 	//set the current light
 	currentLight = &mainLight;
+
+	//set how far the coloured light will travel in the x and y direction
+	colouredLightLimitsMax = colouredLight.getLightPosition()[0] + 10;
+	colouredLightLimitsMin = colouredLight.getLightPosition()[0] - 10;
+	//set how fast the light moves
+	colouredLightVelocity = 5;
 
 	
 }
@@ -320,6 +327,7 @@ void Scene::renderScene() {
 	if (shadowCheck == 0) {
 		//rendering the lights
 		mainLight.render();
+
 
 		colouredLight.render();
 
@@ -639,6 +647,14 @@ void Scene::update(float dt)
 	if (tableSpin) {
 		tableSpinSpeed += 45 * dt;
 	}
+	//change the velocities direction if the light reaches its x min or max limit
+	if (colouredLight.getLightPosition()[0] > colouredLightLimitsMax) {
+		colouredLightVelocity = -5;
+	}
+	else if (colouredLight.getLightPosition()[0] < colouredLightLimitsMin) {
+		colouredLightVelocity = 5;
+	}
+	colouredLight.setLightPosition(new GLfloat[4]{ colouredLight.getLightPosition()[0] + (colouredLightVelocity * dt),colouredLight.getLightPosition()[1],colouredLight.getLightPosition()[2],colouredLight.getLightPosition()[3] });
 	// Calculate FPS for output
 	calculateFPS();
 }
